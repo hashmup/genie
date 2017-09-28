@@ -10,8 +10,27 @@ class ConfigParser():
       Add check for config file here.
       Return None if given config is not sufficient
     """
-    print(config)
-    return config
+    if config.build is None or config.job is None:
+      print('Need build and job in json file')
+      return None
+    if self.config_build_check(config.build) and self.config_job_check(config.job):
+      print(config)
+      return config
+    return None
+
+  def config_build_check(self, build):
+    """
+      Add check for build parameters here
+      Return False if something is missing.
+    """
+    return True
+
+  def config_job_check(self, job):
+    """
+      Add check for job parameters here.
+      Return False if something is missing.
+    """
+    return True
 
   def parse(self):
     try:
