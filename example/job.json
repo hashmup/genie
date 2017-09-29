@@ -1,5 +1,19 @@
 {
     "build" : {
+        "build": {
+            "neuron_path": "../nrn-7.2",
+            "specials_path": "../specials"
+        },
+        "build_config": {
+            "options": [
+              "--without-iv",
+              "--without-x"
+            ],
+            "compile_options": {
+              "CC": "gcc",
+              "CXX": "g++"
+            }
+        }
     },
     "job" : {
     }
