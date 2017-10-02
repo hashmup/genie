@@ -6,6 +6,7 @@ Automatically test the parameters given in config file to optimize code
 from argparse import ArgumentParser
 from configparser import ConfigParser
 from buildgenerator import BuildGenerator
+from jobgenerator import JobGenerator
 class Genie():
   def __init__(self, args=None):
     self.args = args
@@ -22,6 +23,8 @@ class Genie():
     if self.check_config():
       bg = BuildGenerator(self.config['build'])
       bg.gen()
+      jg = JobGenerator(self.config['job'])
+      jg.gen()
 
 def parse_args():
   parser = ArgumentParser(description=__doc__)

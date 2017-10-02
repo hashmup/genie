@@ -16,5 +16,16 @@
         }
     },
     "job" : {
+        "type": "cluster",
+        "job_cluster": {
+            "modules": [
+            ],
+            "omp_num_threads": 16,
+            "nrniv": "../specials/x86_64/special -mpi",
+            "hoc_name": "../hoc/bench_main.hoc",
+            "stop_time": 200,
+            "nthread": 16,
+            "prof": ""
+        }
     }
 }
