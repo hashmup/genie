@@ -20,7 +20,7 @@
         "job_cluster": {
             "modules": [
             ],
-            "omp_num_threads": 16,
+            "omp_num_threads": "2,16,2",
             "nrniv": "../specials/x86_64/special -mpi",
             "hoc_name": "../hoc/bench_main.hoc",
             "stop_time": 200,
