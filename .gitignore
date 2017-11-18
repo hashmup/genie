@@ -1,4 +1,5 @@
 *.pyc
 
+neuron_kplus/
 tmp/
 __pycache__/

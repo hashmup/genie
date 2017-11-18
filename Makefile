@@ -1,4 +1,6 @@
 all: run
+pull:
+	bash scripts/pull.sh
 clean-pyc:
 	find . -name '*.pyc' -exec rm -f{} +
 	find . -name '*.pyo' -exec rm -f {} +
