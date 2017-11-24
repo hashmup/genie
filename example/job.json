@@ -7,17 +7,27 @@
         "build_config": {
             "options": [
               "--without-iv",
-              "--without-x"
+              "--without-x",
+              "--without-nrnoc-x11",
+              "--with-paranrn",
+              "--with-mpi",
+              "--with-multisend",
+              "--enable-shared=no",
+              "--enable-static=yes"
             ],
             "compile_options": {
-              "CC": "gcc",
-              "CXX": "g++"
+              "linux_nrnmech":"no",
+              "use_pthread":"no",
+              "CFLAGS":"\"-O3 -fopenmp -DKPLUS -DKPLUS_GATHER_SCATTER -DKPLUS_SPAWN -DCLUSTER_USE_OMP\"",
+              "CXXFLAGS":"\"-O3 -fopenmp -DKPLUS -DKPLUS_GATHER_SCATTER -DKPLUS_SPAWN -DCLUSTER_USE_OMP\""
             }
         }
     },
     "job" : {
         "type": "cluster",
         "job_cluster": {
+            "nodes":"2",
+            "ppn":"2,28,1",
             "modules": [
             ],
             "omp_num_threads": "2,16,2",

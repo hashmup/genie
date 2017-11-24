@@ -11,9 +11,9 @@ class Shell:
         for command in commands:
             self.execute(
                 command["command"],
-                command.["args"],
-                command.["options"],
-                command.["work_dir"]
+                command["args"],
+                command["options"],
+                command["work_dir"]
             )
     def execute(self, command, args, options, work_dir):
         """
@@ -23,10 +23,12 @@ class Shell:
         " Return: [stdout, stderr]
         """
         cmd = self.make_cmd(command, args, options)
+        cwd = "{0}/{1}".format(os.path.dirname(os.path.realpath(__file__)), work_dir)
         process = Popen(
             args=cmd,
             stdout=PIPE,
             stderr=PIPE,
+            cwd=cwd,
             shell=True
         )
         return process.communicate()
@@ -42,5 +44,5 @@ class Shell:
             return ret
         ret += " ".join([str(v) for v in options])
         return ret
-    def make_cmd(self, command, args, command):
+    def make_cmd(self, command, args, options):
         return "{0} {1} {2}".format(command, self.parse_args(args), self.parse_options(options))

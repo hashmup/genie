@@ -22,11 +22,13 @@ class JobProcessor():
     self.done = False
   def has_next(self):
     return not self.done
-  def process(self):
+  def cur_params(self):
     params = defaultdict(dict)
     for k in self.index_table:
         params[k] = self.job_table[k][self.index_table[k]]
-    print(params)
+    return params
+  def process(self):
+    params = self.cur_params()
     self.job_generator.gen(params)
 
     # proceed by 1

@@ -33,7 +33,7 @@ class BuildProcessor():
     self.make_table_(self.build_config_param_dict)
   def has_next(self):
     return not self.done
-  def process(self):
+  def cur_params(self):
     params = defaultdict(dict)
     for k in self.index_table:
       if k not in self.build_table:
@@ -47,7 +47,9 @@ class BuildProcessor():
           params[k] = self.build_table[k]
         else:
           params[k] = self.build_table[k][self.index_table[k]]
-    print(params)
+    return params
+  def process(self):
+    params = self.cur_params()
     self.build_generator.gen(params)
 
     # proceed by 1

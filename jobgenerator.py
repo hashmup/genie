@@ -7,6 +7,8 @@ class JobGenerator(Generator):
     Generator.__init__(self, [[self.job_name, 'sh']])
   def gen(self, params):
     tmp = self.contents[self.job_name]['template'].render(\
+        nodes=params['nodes'],\
+        ppn=params['ppn'],\
         modules=params['modules'],\
         omp_num_threads=params['omp_num_threads'],\
         nrniv=params['nrniv'],\
