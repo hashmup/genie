@@ -1,6 +1,8 @@
 import re
 import time
 from shell import Shell
+from summarizer import Summarizer
+import pandas as pd
 import threading
 
 id_cluster_exp = re.compile("(?P<id>[0-9]+).\w+.\w+")
@@ -20,7 +22,9 @@ class TaskRunner:
         self.running_jobs = []
         self.current_build_param = None
         self.shell = Shell()
+        self.summarizer = Summarizer()
         self.environment = environment
+        self.result_table = pd.DataFrame()
     def push_job(self, build_param, job_param):
         self.pending_jobs.append([build_param, job_param])
     def deploy_job(self):
@@ -29,6 +33,11 @@ class TaskRunner:
             job_id = self.deploy(self.current_build_param != build_param)
             self.current_build_param = build_param
             self.running_jobs.append(job_id)
+            merge_params = dict(build_param.items(), job_param.items(), {"job_id":job_id, "time":0}.items())
+            for key in merge_params.keys():
+                self.result_table.loc[-1, key] = merge_params[key]
+            self.result_table.index = self.result_table.index + 1
+            self.result_table = self.result_table.sort_index()
     def is_job_still_running(self, job_id):
         res = self.shell.execute("qstat", [], [], "")
         job_lines = res[0].split('\n')
@@ -47,8 +56,11 @@ class TaskRunner:
             if not self.is_job_still_running(self.running_jobs[i]):
                 print("complete %s"%self.running_jobs[i])
                 self.current_job_num -= 1
+                time = self.summarizer.summary(self.environment, self.running_jobs[i])
+                self.result_table.ix[self.result_table['job_id'] == self.running_jobs[i]]['time'] = time
                 del self.running_jobs[i]
         if len(self.pending_jobs) == 0 and len(self.running_jobs) == 0:
+            self.result_table.to_csv("result.csv")
             self.timer_.cancel()
         self.timer_ = threading.Timer(3.0, self.watch_job)
         self.timer_.start()
