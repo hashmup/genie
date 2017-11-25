@@ -7,7 +7,9 @@ clean-pyc:
 	find . -name '*~' -exec rm -f  {} +
 clean-dir:
 	rm -rf tmp
-clean:  clean-dir
+clean-log:
+	rm -rf neuron_kplus/hoc/job_*.sh.*
+clean:  clean-dir clean-pyc clean-log
 
 run: clean
 	python main.py example/job.json
