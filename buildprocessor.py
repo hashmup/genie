@@ -13,7 +13,7 @@ class BuildProcessor():
     def make_table_(self, dict_):
         for k in dict_:
             tmp = self.rangestr2array(dict_[k])
-            if dict_[k] isinstance(list()):
+            if isinstance(dict_[k], list):
                 self.not_iterate[k] = True
             if tmp isinstace(defaultdict()):
                 for k2 in tmp:
@@ -44,7 +44,7 @@ class BuildProcessor():
         for k in self.index_table:
             if k not in self.build_table:
                 continue
-            if self.build_table[k] isinstance(defaultdict()):
+            if isinstance(self.build_table[k], defaultdict):
                 params[k] = defaultdict(dict)
                 for k2 in self.build_table[k]:
                     key = self.index_table["{0}.{1}".format(k, k2)]
@@ -64,7 +64,7 @@ class BuildProcessor():
         for k in self.index_table:
             if k not in self.build_table or k in self.not_iterate:
                 continue
-            if self.build_table[k] isinstance(defaultdict()):
+            if isinstance(self.build_table[k], defaultdict):
                 for k2 in self.build_table[k]:
                     if self.index_table["{0}.{1}".format(k, k2)] <
                     len(self.build_table[k][k2]) - 1:
