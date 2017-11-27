@@ -44,5 +44,5 @@ class ConfigParser():
                 print(config)
                 return self.arg_check(config)
         except ValueError as e:
-            print('invalid json: %s' % e)
+            print('invalid json: {0}'.format(e))
             return None

@@ -17,7 +17,7 @@ class BuildProcessor():
                 self.not_iterate[k] = True
             if tmp isinstace(defaultdict()):
                 for k2 in tmp:
-                    self.index_table["{}.{}".format(k, k2)] = 0
+                    self.index_table["{0}.{1}".format(k, k2)] = 0
                 self.build_table[k] = tmp
                 self.index_table[k] = 0
             elif tmp is not None and len(tmp) != 0:
@@ -47,7 +47,7 @@ class BuildProcessor():
             if self.build_table[k] isinstance(defaultdict()):
                 params[k] = defaultdict(dict)
                 for k2 in self.build_table[k]:
-                    key = self.index_table["{}.{}".format(k, k2)]
+                    key = self.index_table["{0}.{1}".format(k, k2)]
                     params[k][k2] = self.build_table[k][k2][key]
             else:
                 if k in self.not_iterate:
@@ -66,9 +66,9 @@ class BuildProcessor():
                 continue
             if self.build_table[k] isinstance(defaultdict()):
                 for k2 in self.build_table[k]:
-                    if self.index_table["{}.{}".format(k, k2)] <
+                    if self.index_table["{0}.{1}".format(k, k2)] <
                     len(self.build_table[k][k2]) - 1:
-                        self.index_table["{}.{}".format(k, k2)] += 1
+                        self.index_table["{0}.{1}".format(k, k2)] += 1
                         return
             if self.index_table[k] < len(self.build_table[k]) - 1:
                 self.index_table[k] += 1
