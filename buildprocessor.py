@@ -66,7 +66,7 @@ class BuildProcessor():
                 continue
             if isinstance(self.build_table[k], defaultdict):
                 for k2 in self.build_table[k]:
-                    if self.index_table["{0}.{1}".format(k, k2)] <
+                    if self.index_table["{0}.{1}".format(k, k2)] <\
                     len(self.build_table[k][k2]) - 1:
                         self.index_table["{0}.{1}".format(k, k2)] += 1
                         return
