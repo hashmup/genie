@@ -9,6 +9,7 @@ clean-dir:
 	rm -rf tmp
 clean-log:
 	rm -rf neuron_kplus/hoc/job_*.sh.*
+	rm result.csv
 clean:  clean-dir clean-pyc clean-log
 
 run: clean

@@ -55,7 +55,6 @@ class TaskRunner:
             for line in job_lines[2:]:
                 m = job_exp.match(line)
                 if m is not None:
-                    print(m.group("state"), m.group("id"))
                     state = m.group("state")
                     if job_id == m.group("id") and state == "C":
                         return False
@@ -63,19 +62,22 @@ class TaskRunner:
     def watch_job(self):
         print("test")
         self.lock.acquire()
+        print(self.running_jobs)
+        print(len(self.running_jobs))
         for i in range(len(self.running_jobs)):
             if not self.is_job_still_running(self.running_jobs[i]):
                 print("complete %s"%self.running_jobs[i])
                 self.current_job_num -= 1
                 time = self.summarizer.summary(self.environment, self.running_jobs[i])
-                self.result_table.ix[self.result_table['job_id'] == self.running_jobs[i]]['time'] = time
+                self.result_table.loc[self.result_table['job_id'] == self.running_jobs[i], 'time'] = time
                 del self.running_jobs[i]
+                break
         self.lock.release()
         if len(self.pending_jobs) == 0 and len(self.running_jobs) == 0:
             self.result_table.to_csv("result.csv")
             self.timer_.cancel()
             return
-        self.timer_ = threading.Timer(5.0, self.watch_job)
+        self.timer_ = threading.Timer(20.0, self.watch_job)
         self.timer_.start()
     def run(self):
         t = threading.Thread(target=self.watch_job)
