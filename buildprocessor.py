@@ -15,7 +15,7 @@ class BuildProcessor():
             tmp = self.rangestr2array(dict_[k])
             if isinstance(dict_[k], list):
                 self.not_iterate[k] = True
-            if tmp isinstace(defaultdict()):
+            if isinstance(tmp, defaultdict):
                 for k2 in tmp:
                     self.index_table["{0}.{1}".format(k, k2)] = 0
                 self.build_table[k] = tmp
