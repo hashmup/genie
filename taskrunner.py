@@ -8,15 +8,20 @@ import threading
 
 id_cluster_exp = re.compile("(?P<id>[0-9]+).\w+.\w+")
 id_k_exp = re.compile("(?P<id>[0-9]+).\w+.\w+")
-job_exp = re.compile("(?P<id>\d+).\w+\s+\w+.\w+\s+\w+\s+\d+:\d+:\d+\s+(?P<state>\w+)\s+\w+\s+")
+job_exp = re.compile(
+    "(?P<id>\d+).\w+\s+\w+.\w+\s+\w+\s+\d+:\d+:\d+\s+(?P<state>\w+)\s+\w+\s+")
+
+
 class TaskRunner:
     """
     " This class is singleton.
     " Whenever you want to assign new job, call push_job().
-    " If the number of concurrent running job is under max_num_jobs, we will simply deploy it
+    " If the number of concurrent running job is under max_num_jobs,
+    " we will simply deploy it.
     " In other case, we will wait other jobs to be done and then deploy
     """
     MAX_NUM_JOBS = 4
+
     def __init__(self, environment):
         self.current_job_num = 0
         self.pending_jobs = []
@@ -27,27 +32,35 @@ class TaskRunner:
         self.environment = environment
         self.result_table = pd.DataFrame()
         self.lock = threading.Lock()
+
     def push_job(self, build_param, job_param):
         self.pending_jobs.append([build_param, job_param])
+
     def deploy_job(self):
         if len(self.pending_jobs) > 0:
             build_param, job_param = self.pending_jobs.pop(0)
             job_id = self.deploy(self.current_build_param != build_param)
             self.current_build_param = build_param
             self.running_jobs.append(job_id)
-            merge_params = dict(build_param.items() + job_param.items() + {"job_id":job_id, "time":0}.items())
+            merge_params =
+            dict(build_param.items() +
+                 job_param.items() +
+                 {"job_id": job_id, "time": 0}.items())
             print(merge_params)
             for key in merge_params.keys():
-                if type(merge_params[key]) is type(defaultdict()) or type(merge_params[key]) is type(list()):
+                if merge_params[key] isinstance(defaultdict()) or
+                merge_params[key] isinstance(list()):
                     if key not in self.result_table:
                         self.result_table.loc[-1, key] = 0
-                    self.result_table[key] = self.result_table[key].astype('object')
+                    self.result_table[key] =
+                    self.result_table[key].astype('object')
                     self.result_table.set_value(-1, key, merge_params[key])
                 else:
                     self.result_table.loc[-1, key] = merge_params[key]
             self.result_table.index = self.result_table.index + 1
             self.result_table = self.result_table.sort_index()
             print(self.result_table)
+
     def is_job_still_running(self, job_id):
         res = self.shell.execute("qstat", [], [], "")
         job_lines = res[0].split('\n')
@@ -59,6 +72,7 @@ class TaskRunner:
                     if job_id == m.group("id") and state == "C":
                         return False
         return True
+
     def watch_job(self):
         print("test")
         self.lock.acquire()
@@ -66,10 +80,12 @@ class TaskRunner:
         print(len(self.running_jobs))
         for i in range(len(self.running_jobs)):
             if not self.is_job_still_running(self.running_jobs[i]):
-                print("complete %s"%self.running_jobs[i])
+                print("complete {0}".format(self.running_jobs[i]))
                 self.current_job_num -= 1
-                time = self.summarizer.summary(self.environment, self.running_jobs[i])
-                self.result_table.loc[self.result_table['job_id'] == self.running_jobs[i], 'time'] = time
+                time = self.summarizer.summary(self.environment,
+                                               self.running_jobs[i])
+                key = self.result_table['job_id'] == self.running_jobs[i]
+                self.result_table.loc[key, 'time'] = time
                 del self.running_jobs[i]
                 break
         self.lock.release()
@@ -79,6 +95,7 @@ class TaskRunner:
             return
         self.timer_ = threading.Timer(20.0, self.watch_job)
         self.timer_.start()
+
     def run(self):
         t = threading.Thread(target=self.watch_job)
         t.start()
@@ -87,116 +104,120 @@ class TaskRunner:
                 time.sleep(20)
             while self.current_job_num < self.MAX_NUM_JOBS:
                 print(self.running_jobs)
-                print(self.current_job_num, len(self.pending_jobs), len(self.running_jobs))
+                print(self.current_job_num,
+                      len(self.pending_jobs),
+                      len(self.running_jobs))
                 self.deploy_job()
                 self.current_job_num += 1
+
     def run_build(self):
         commands = []
         if self.environment == "cluster":
             commands = [{
-                "command":"make",
-                "args":["clean"],
-                "options":[],
+                "command": "make",
+                "args": ["clean"],
+                "options": [],
                 "work_dir": "neuron_kplus/nrn-7.2"
             },
-            {
-                "command":"../../tmp/build_config.sh",
-                "args":[],
-                "options":[],
+                {
+                "command": "../../tmp/build_config.sh",
+                "args": [],
+                "options": [],
                 "work_dir": "neuron_kplus/nrn-7.2"
             },
-            {
-                "command":"make",
-                "args":[],
-                "options":[],
+                {
+                "command": "make",
+                "args": [],
+                "options": [],
                 "work_dir": "neuron_kplus/nrn-7.2"
             },
-            {
-                "command":"make",
-                "args":["install"],
-                "options":[],
+                {
+                "command": "make",
+                "args": ["install"],
+                "options": [],
                 "work_dir": "neuron_kplus/nrn-7.2"
             },
-            {
-                "command":"./make_special_x86_64.sh",
-                "args":[],
-                "options":[],
+                {
+                "command": "./make_special_x86_64.sh",
+                "args": [],
+                "options": [],
                 "work_dir": "neuron_kplus/specials"
             }]
         if self.environment == "k":
             commands = [{
-                "command":"../../tmp/build_config.sh",
-                "args":[],
+                "command": "../../tmp/build_config.sh",
+                "args": [],
                 "options":[],
                 "work_dir": "neuron_kplus/nrn-7.3"
             },
-            {
-                "command":"bash",
-                "args":["../../tmp/build.sh"],
-                "options":[],
+                {
+                "command": "bash",
+                "args": ["../../tmp/build.sh"],
+                "options": [],
                 "work_dir": "neuron_kplus/nrn-7.3"
             },
-            {
-                "command":"make",
-                "args":["clean"],
-                "options":[],
+                {
+                "command": "make",
+                "args": ["clean"],
+                "options": [],
                 "work_dir": "neuron_kplus/nrn-7.3"
             },
-            {
-                "command":"make",
-                "args":[],
-                "options":[],
+                {
+                "command": "make",
+                "args": [],
+                "options": [],
                 "work_dir": "neuron_kplus/nrn-7.3"
             },
-            {
-                "command":"make",
-                "args":["install"],
-                "options":[],
+                {
+                "command": "make",
+                "args": ["install"],
+                "options": [],
                 "work_dir": "neuron_kplus/nrn-7.3"
             },
-            {
-                "command":"../../tmp/build_config_tune.sh",
-                "args":[],
-                "options":[],
+                {
+                "command": "../../tmp/build_config_tune.sh",
+                "args": [],
+                "options": [],
                 "work_dir": "neuron_kplus/nrn-7.3"
             },
-            {
-                "command":"bash",
-                "args":["../../tmp/build.sh"],
-                "options":[],
+                {
+                "command": "bash",
+                "args": ["../../tmp/build.sh"],
+                "options": [],
                 "work_dir": "neuron_kplus/nrn-7.3"
             },
-            {
-                "command":"make",
-                "args":["clean"],
-                "options":[],
+                {
+                "command": "make",
+                "args": ["clean"],
+                "options": [],
                 "work_dir": "neuron_kplus/nrn-7.3"
             },
-            {
-                "command":"make",
-                "args":[],
-                "options":[],
+                {
+                "command": "make",
+                "args": [],
+                "options": [],
                 "work_dir": "neuron_kplus/nrn-7.3"
             },
-            {
-                "command":"make",
-                "args":["install"],
-                "options":[],
+                {
+                "command": "make",
+                "args": ["install"],
+                "options": [],
                 "work_dir": "neuron_kplus/nrn-7.3"
             },
-            {
-                "command":"cp",
-                "args":["./x86_64/bin/*", "./sparc64/bin/"],
-                "options":[],
+                {
+                "command": "cp",
+                "args": ["./x86_64/bin/*", "./sparc64/bin/"],
+                "options": [],
                 "work_dir": "neuron_kplus/exec"
             },
-            {
-                "command":"./make_special_sparc64.sh",
-                "args":[],
-                "options":[],
+                {
+                "command": "./make_special_sparc64.sh",
+                "args": [],
+                "options": [],
                 "work_dir": "neuron_kplus/specials"
             }]
         self.shell.run_cmds(commands)
+
     def run_job(self):
         if self.environment == "cluster":
             res = self.shell.execute(
@@ -216,6 +237,7 @@ class TaskRunner:
             )
             m = id_k_exp.match(res[0])
             return m.group("id")
+
     def deploy(self, shouldBuild):
         if shouldBuild:
             self.run_build()

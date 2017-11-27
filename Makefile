@@ -2,14 +2,15 @@ all: run
 pull:
 	bash scripts/pull.sh
 clean-pyc:
-	find . -name '*.pyc' -exec rm -f{} +
-	find . -name '*.pyo' -exec rm -f {} +
-	find . -name '*~' -exec rm -f  {} +
+	rm -rf *.pyc
+	rm -rf *.pyo
 clean-dir:
 	rm -rf tmp
 clean-log:
 	rm -rf neuron_kplus/hoc/job_*.sh.*
-	rm result.csv
+	rm -rf result.csv
+clean-cache:
+	rm -rf __pycache__
 clean:  clean-dir clean-pyc clean-log
 
 run: clean
