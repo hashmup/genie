@@ -48,8 +48,8 @@ class TaskRunner:
                  {"job_id": job_id, "time": 0}.items())
             print(merge_params)
             for key in merge_params.keys():
-                if merge_params[key] isinstance(defaultdict()) or
-                merge_params[key] isinstance(list()):
+                if isinstance(merge_params[key], defaultdict) or
+                isinstance(merge_params[key], list):
                     if key not in self.result_table:
                         self.result_table.loc[-1, key] = 0
                     self.result_table[key] =

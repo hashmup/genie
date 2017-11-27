@@ -46,7 +46,7 @@ class JobProcessor():
 
     def rangestr2array(self, rangestr):
         # if given str is already array then just return it.
-        if rangestr isinstance(list()):
+        if isinstance(rangestr, list):
             return rangestr
         if type(rangestr) is int:
             return [rangestr]

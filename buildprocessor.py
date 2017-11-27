@@ -77,11 +77,11 @@ class BuildProcessor():
 
     def rangestr2array(self, rangestr):
         # if given str is already array then just return it.
-        if rangestr isinstance(list()):
+        if isinstance(rangestr, list):
             return rangestr
         if type(rangestr) is int:
             return [rangestr]
-        if rangestr isinstance(dict()):
+        if isinstance(rangestr, dict):
             ret = defaultdict(dict)
             for k in rangestr:
                 ret[k] = self.rangestr2array(rangestr[k])
