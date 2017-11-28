@@ -26,8 +26,9 @@ class Shell:
         " Return: [stdout, stderr]
         """
         cmd = self.make_cmd(command, args, options)
-        cwd = "{0}/{1}".format(
-            os.path.dirname(os.path.realpath(__file__)), work_dir)
+        cwd = work_dir
+        if work_dir == '':
+            cwd = os.path.dirname(os.path.realpath(__file__))
         process = Popen(
             args=cmd,
             stdout=PIPE,
