@@ -13,4 +13,4 @@ def parse_args():
 
 if __name__ == '__main__':
     args = parse_args()
-    Genie(args=args).run()
+    Genie("../neuron_kplus", args=args).run()

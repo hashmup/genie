@@ -5,13 +5,12 @@ from taskrunner import TaskRunner
 
 
 class Processor():
-    def __init__(self, path):
-        build, job = self.parseConfigFile(path)
+    def __init__(self, config_path, neuron_path):
+        build, job = self.parseConfigFile(config_path)
         self.buildProcessor = BuildProcessor(build)
         self.jobProcessor = JobProcessor(job)
-        self.taskRunner = TaskRunner(job['type'])
+        self.taskRunner = TaskRunner(job['type'], neuron_path)
         self.run()
-        print(self.taskRunner.pending_jobs)
         self.taskRunner.run()
 
     def parseConfigFile(self, path):

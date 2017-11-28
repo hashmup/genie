@@ -4,8 +4,10 @@ pull:
 clean-pyc:
 	rm -rf *.pyc
 	rm -rf *.pyo
+	rm -rf genie/*.pyc
+	rm -rf genie/*.pyo
 clean-dir:
-	rm -rf tmp
+	rm -rf genie/tmp
 clean-log:
 	rm -rf neuron_kplus/hoc/job_*.sh.*
 	rm -rf result.csv

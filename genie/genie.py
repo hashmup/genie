@@ -8,7 +8,8 @@ from processor import Processor
 
 
 class Genie():
-    def __init__(self, args=None):
+    def __init__(self, neuron_path, args=None):
+        self.neuron_path = neuron_path
         self.args = args
 
     def check_config(self):
@@ -19,5 +20,5 @@ class Genie():
 
     def run(self):
         if self.check_config():
-            self.processor = Processor(self.args.config)
+            self.processor = Processor(self.args.config, self.neuron_path)
             self.processor.run()

@@ -22,7 +22,7 @@ class TaskRunner:
     """
     MAX_NUM_JOBS = 4
 
-    def __init__(self, environment):
+    def __init__(self, environment, neuron_path):
         self.current_job_num = 0
         self.pending_jobs = []
         self.running_jobs = []
@@ -32,6 +32,7 @@ class TaskRunner:
         self.environment = environment
         self.result_table = pd.DataFrame()
         self.lock = threading.Lock()
+        self.neuron_path = neuron_path
 
     def push_job(self, build_param, job_param):
         self.pending_jobs.append([build_param, job_param])
@@ -117,31 +118,31 @@ class TaskRunner:
                 "command": "make",
                 "args": ["clean"],
                 "options": [],
-                "work_dir": "neuron_kplus/nrn-7.2"
+                "work_dir": "{0}/nrn-7.2".format(self.neuron_path)
             },
                 {
-                "command": "../../tmp/build_config.sh",
+                "command": "../../genie/tmp/build_config.sh",
                 "args": [],
                 "options": [],
-                "work_dir": "neuron_kplus/nrn-7.2"
+                "work_dir": "{0}/nrn-7.2".format(self.neuron_path)
             },
                 {
                 "command": "make",
                 "args": [],
                 "options": [],
-                "work_dir": "neuron_kplus/nrn-7.2"
+                "work_dir": "{0}/nrn-7.2".format(self.neuron_path)
             },
                 {
                 "command": "make",
                 "args": ["install"],
                 "options": [],
-                "work_dir": "neuron_kplus/nrn-7.2"
+                "work_dir": "{0}/nrn-7.2".format(self.neuron_path)
             },
                 {
                 "command": "./make_special_x86_64.sh",
                 "args": [],
                 "options": [],
-                "work_dir": "neuron_kplus/specials"
+                "work_dir": "{0}/specials".format(self.neuron_path)
             }]
         if self.environment == "k":
             commands = [{
@@ -222,18 +223,18 @@ class TaskRunner:
         if self.environment == "cluster":
             res = self.shell.execute(
                 "qsub",
-                ["../../tmp/job_cluster.sh"],
+                ["../../genie/tmp/job_cluster.sh"],
                 [],
-                "neuron_kplus/hoc"
+                "{0}/hoc".format(self.neuron_path)
             )
             m = id_cluster_exp.match(res[0])
             return m.group("id")
         if self.environment == "k":
             res = self.shell.execute(
                 "psub",
-                ["../../tmp/job_k.sh"],
+                ["../../genie/tmp/job_k.sh"],
                 [],
-                "neuron_kplus/hoc"
+                "{0}/hoc".format(self.neuron_path)
             )
             m = id_k_exp.match(res[0])
             return m.group("id")
