@@ -1,6 +1,6 @@
 import re
 import time
-from shell import Shell
+from utils.shell import Shell
 from summarizer import Summarizer
 from collections import defaultdict
 import pandas as pd

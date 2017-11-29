@@ -1,6 +1,6 @@
 import re
 import sys
-from shell import Shell
+from utils.shell import Shell
 spike_exp = re.compile("SPIKE : \t (?P<val>\d+\.*\d*)\t (?P<idvec>[0-9]+) \
                        \[(?P<pid>\d+)\]")
 start_exp = re.compile("\[(?P<pid>\d+)\] NC = (?P<nc>\d+), SYN = (?P<syn>\d+), \

@@ -24,7 +24,6 @@
         }
     },
     "job" : {
-        "type": "cluster",
         "job_cluster": {
             "nodes":"2",
             "ppn":"2,28,1",
