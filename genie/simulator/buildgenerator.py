@@ -1,5 +1,5 @@
 from generator import Generator
-from utils.fileutil import *
+from ..utils.fileutil import *
 
 
 class BuildGenerator(Generator):

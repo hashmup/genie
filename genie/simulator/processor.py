@@ -2,14 +2,16 @@ from configparser import ConfigParser
 from buildprocessor import BuildProcessor
 from jobprocessor import JobProcessor
 from taskrunner import TaskRunner
+from ..utils.env import Environment
 
 
 class Processor():
     def __init__(self, config_path, neuron_path):
+        self.env = Environment()
         build, job = self.parseConfigFile(config_path)
         self.buildProcessor = BuildProcessor(build)
         self.jobProcessor = JobProcessor(job)
-        self.taskRunner = TaskRunner(job['type'], neuron_path)
+        self.taskRunner = TaskRunner(self.env.get_env(), neuron_path)
         self.run()
         self.taskRunner.run()
 
