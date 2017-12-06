@@ -1,7 +1,7 @@
 from collections import defaultdict
 from os.path import join, dirname, abspath
 from jinja2 import Environment, FileSystemLoader
-from fileutil import *
+from utils.fileutil import *
 
 ROOT = abspath(dirname(__file__))
 
