@@ -3,8 +3,8 @@
 Automatically test the parameters given in config file to optimize code
 """
 
-from configparser import ConfigParser
-from processor import Processor
+from simulator.configparser import ConfigParser
+from simulator.processor import Processor
 
 
 class Genie():
