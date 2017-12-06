@@ -1,0 +1,46 @@
+<?xml version="1.0" ?>
+<ComponentType id="hh_lems">
+	<Requirement dimension="none" name="ena"/>
+	<Exposure dimension="none" name="ina"/>
+	<Requirement dimension="none" name="ek"/>
+	<Exposure dimension="none" name="ik"/>
+	<Parameter dimension="none" name="gnabar"/>
+	<Parameter dimension="none" name="gkbar"/>
+	<Parameter dimension="none" name="gl"/>
+	<Parameter dimension="none" name="el"/>
+	<Exposure dimension="none" name="m"/>
+	<Exposure dimension="none" name="h"/>
+	<Exposure dimension="none" name="n"/>
+	<Dynamics>
+		<StateVariable dimension="none" name="m"/>
+		<StateVariable dimension="none" name="h"/>
+		<StateVariable dimension="none" name="n"/>
+		<DerivedVariable name="rates_{v}__q10" value="3 ^ ((celsius - 6.3) / 10)"/>
+		<DerivedVariable name="rates_{v}__alpha" value=".1 * vtrap_ - ({v} + 40)_10"/>
+		<DerivedVariable name="rates_{v}__beta" value="4 * exp( - ({v} + 65) / 18)"/>
+		<DerivedVariable name="rates_{v}__sum" value="rates_{v}__alpha + rates_{v}__beta"/>
+		<DerivedVariable name="mtau" value="1 / (rates_{v}__q10 * rates_{v}__sum)"/>
+		<DerivedVariable name="minf" value="rates_{v}__alpha / rates_{v}__sum"/>
+		<DerivedVariable name="rates_{v}__alpha" value=".07 * exp( - ({v} + 65) / 20)"/>
+		<DerivedVariable name="rates_{v}__beta" value="1 / (exp( - ({v} + 35) / 10) + 1)"/>
+		<DerivedVariable name="rates_{v}__sum" value="rates_{v}__alpha + rates_{v}__beta"/>
+		<DerivedVariable name="htau" value="1 / (rates_{v}__q10 * rates_{v}__sum)"/>
+		<DerivedVariable name="hinf" value="rates_{v}__alpha / rates_{v}__sum"/>
+		<DerivedVariable name="rates_{v}__alpha" value=".01 * vtrap_ - ({v} + 55)_10"/>
+		<DerivedVariable name="rates_{v}__beta" value=".125 * exp( - ({v} + 65) / 80)"/>
+		<DerivedVariable name="rates_{v}__sum" value="rates_{v}__alpha + rates_{v}__beta"/>
+		<DerivedVariable name="ntau" value="1 / (rates_{v}__q10 * rates_{v}__sum)"/>
+		<DerivedVariable name="ninf" value="rates_{v}__alpha / rates_{v}__sum"/>
+		<ConditionalDerivedVariable name="vtrap_ - ({v} + 40)_10">
+			<Case condition="fabs( - ({v} + 40) / 10) .lt. 1e-6" value="10 * (1 -  - ({v} + 40) / 10 / 2)"/>
+			<Case value=" - ({v} + 40) / (exp( - ({v} + 40) / 10) - 1)"/>
+		</ConditionalDerivedVariable>
+		<ConditionalDerivedVariable name="vtrap_ - ({v} + 55)_10">
+			<Case condition="fabs( - ({v} + 55) / 10) .lt. 1e-6" value="10 * (1 -  - ({v} + 55) / 10 / 2)"/>
+			<Case value=" - ({v} + 55) / (exp( - ({v} + 55) / 10) - 1)"/>
+		</ConditionalDerivedVariable>
+		<TimeDerivative value="(minf - m) / mtau" variable="m"/>
+		<TimeDerivative value="(hinf - h) / htau" variable="h"/>
+		<TimeDerivative value="(ninf - n) / ntau" variable="n"/>
+	</Dynamics>
+</ComponentType>
