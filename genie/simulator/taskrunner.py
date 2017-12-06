@@ -121,7 +121,7 @@ class TaskRunner:
                 "work_dir": "{0}/nrn-7.2".format(self.neuron_path)
             },
                 {
-                "command": "../../genie/tmp/build_config.sh",
+                "command": "../../genie/simulator/tmp/build_config.sh",
                 "args": [],
                 "options": [],
                 "work_dir": "{0}/nrn-7.2".format(self.neuron_path)
@@ -146,14 +146,14 @@ class TaskRunner:
             }]
         if self.environment == "k":
             commands = [{
-                "command": "../../tmp/build_config.sh",
+                "command": "../../genie/simulator/tmp/build_config.sh",
                 "args": [],
                 "options":[],
                 "work_dir": "neuron_kplus/nrn-7.3"
             },
                 {
                 "command": "bash",
-                "args": ["../../tmp/build.sh"],
+                "args": ["../../genie/simulator/tmp/build.sh"],
                 "options": [],
                 "work_dir": "neuron_kplus/nrn-7.3"
             },
@@ -176,14 +176,14 @@ class TaskRunner:
                 "work_dir": "neuron_kplus/nrn-7.3"
             },
                 {
-                "command": "../../tmp/build_config_tune.sh",
+                "command": "../../genie/simulator/tmp/build_config_tune.sh",
                 "args": [],
                 "options": [],
                 "work_dir": "neuron_kplus/nrn-7.3"
             },
                 {
                 "command": "bash",
-                "args": ["../../tmp/build.sh"],
+                "args": ["../../genie/simulator/tmp/build.sh"],
                 "options": [],
                 "work_dir": "neuron_kplus/nrn-7.3"
             },
@@ -223,7 +223,7 @@ class TaskRunner:
         if self.environment == "cluster":
             res = self.shell.execute(
                 "qsub",
-                ["../../genie/tmp/job_cluster.sh"],
+                ["../../genie/simulator/tmp/job_cluster.sh"],
                 [],
                 "{0}/hoc".format(self.neuron_path)
             )
@@ -232,7 +232,7 @@ class TaskRunner:
         if self.environment == "k":
             res = self.shell.execute(
                 "psub",
-                ["../../genie/tmp/job_k.sh"],
+                ["../../genie/simulator/tmp/job_k.sh"],
                 [],
                 "{0}/hoc".format(self.neuron_path)
             )
