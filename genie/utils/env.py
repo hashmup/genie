@@ -1,3 +1,4 @@
+import re
 from shell import Shell
 
 
@@ -31,9 +32,10 @@ class Environment():
 
     def get_env(self):
         os = self.get_os()
+        print(os)
         if os == "k":
             return "k"
-        elif os == "linux":
+        elif os != "unknown":
             return "cluster"
         else:
             return "unknown"
