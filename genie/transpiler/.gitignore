@@ -1,1 +1,5 @@
 .ipynb_checkpoints/
+example/x86_64/
+__pycache__/
+parser/__pycache__/
+tmp/

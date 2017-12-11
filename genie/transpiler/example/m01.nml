@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<ComponentType id="m02_lems">
+	<Exposure dimension="none" name="a"/>
+	<Exposure dimension="none" name="a1"/>
+	<Exposure dimension="none" name="a"/>
+	<Exposure dimension="none" name="a1"/>
+	<Dynamics>
+		<StateVariable dimension="none" name="a"/>
+		<StateVariable dimension="none" name="a1"/>
+		<TimeDerivative value="a1" variable="a"/>
+		<TimeDerivative value="a" variable="a1"/>
+		<StateVariable dimension="none" name="a"/>
+		<StateVariable dimension="none" name="a1"/>
+		<TimeDerivative value="a1" variable="a"/>
+		<TimeDerivative value="a" variable="a1"/>
+	</Dynamics>
+</ComponentType>

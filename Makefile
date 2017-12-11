@@ -17,3 +17,6 @@ clean:  clean-dir clean-pyc clean-log
 
 run: clean
 	python main.py example/job.json
+
+compile:
+	python genie/transpiler/transpiler.py example/hh.mod

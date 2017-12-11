@@ -56,7 +56,7 @@ ASSIGNED {
 	mtau (ms) htau (ms) ntau (ms)
 }
 
-? currents
+:? currents
 BREAKPOINT {
         SOLVE states METHOD cnexp
         gna = gnabar*m*m*m*h

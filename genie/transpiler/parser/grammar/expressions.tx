@@ -1,0 +1,57 @@
+import comment
+import keyword
+import variable
+import units
+import table
+import local
+
+Statement: UnitsCtrl | Locals | Table | FuncDef | Block | Primed | IfStatement |
+		 WhileStatement | FromStatement | Expression;
+
+Block: '{' stmts*=Statement '}';
+
+IfStatement: IF '(' cond=Expression ')'
+				true_blk=Block
+				(ELSEIF '(' elif_cond=Expression ')' elif_blk=Block)* 
+				(ELSE false_blk=Block)?;
+WhileStatement: WHILE '(' cond=Expression ')' b=Block;
+IF: 'if' | 'IF';
+WHILE: 'while' | 'WHILE';
+ELSE: 'else' | 'ELSE';
+ELSEIF: 'else if' | 'ELSE IF';
+
+FromStatement: 'FROM' counter=FromCounter '=' from=Expression 'TO' to=Expression b=Block;
+FromCounter: name=ID;
+
+Primed: variable=ID/'+/ '='!'='? expression=LogicalCon;
+
+Expression: Assignment;
+Assignment: (variable=VarRef '='!'=')? expression=LogicalCon;
+LogicalCon: op=Relational (op=LogCon op=Relational)*;
+Relational: op=Addition (op=RelOp op=Addition)*;
+Addition: op=Multiplication (op=PlusOrMinus op=Multiplication)* ;
+Multiplication: op=Exponentiation (op=MulOrDiv op=Exponentiation)*;
+Exponentiation: op=Negation (op=Exp op=Exponentiation)?; //using Exponentiation? here for right assoc
+Negation: (sign=PlusOrMinus)?  primary=Primary;
+Primary: FuncCall | Paren | Num | VarRef ;
+
+Var: Local | FuncPar | Variable | FuncDef | FromCounter; // FuncDef here because of function return val syntax
+VarRef:  var=[Var] ('[' idx=Expression ']')?;
+
+Num: num=NUMBER (unit=UnitId)?;
+Func: FuncDef | FunctionTable;
+Callable: builtin=Builtin | user=[Func];
+FuncCall: func=Callable '(' args*=Expression[',']  ')';
+Paren: ('(' ex=Expression ')');
+
+FuncPar: name=ID (unit=UnitId)?;
+FuncDef:  (is_function?='FUNCTION' | is_procedure?='PROCEDURE')
+			name=ID '(' pars*=FuncPar[','] ')' (unit=UnitId)?  b=Block;
+
+PlusOrMinus: o=/\+|\-/;
+MulOrDiv: o=/\*|\//;
+Exp: o='^';
+RelOp: o=/([<>]=?|[!=]=)/;
+LogCon: o=/(&&)|(\|\|)/;
+
+NUMBER: /[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?/;
