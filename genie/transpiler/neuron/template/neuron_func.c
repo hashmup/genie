@@ -4,10 +4,7 @@ static void nrn_alloc(Prop* _prop) {
   Datum *_ppvar;
   _p = nrn_prop_data_alloc(_mechtype, 19, _prop);
   /*initialize range parameters*/
-  gnabar = 0.12;
-  gkbar = 0.036;
-  gl = 0.0003;
-  el = -54.3;
+{{ nrn_alloc.init_range_parameter }}
   _prop->param = _p;
   _prop->param_size = 19;
   _ppvar = nrn_prop_datum_alloc(_mechtype, 7, _prop);
@@ -360,10 +357,10 @@ static void nrn_cur(_NrnThread* _nt, _Memb_list* _ml, int _type)
 #endif
 }
 
-static void nrn_jacob(_NrnThread* _nt, _Memb_list* _ml, int _type)
-{
-  double* _p; Datum* _ppvar; Datum* _thread;
-  Node *_nd; int* _ni; int _iml, _cntml;
+static void nrn_jacob(_NrnThread* _nt, _Memb_list* _ml, int _type) {
+  Datum* _thread;
+  int* _ni;
+  int _iml, _cntml;
 
   _ni = _ml->_nodeindices;
   _cntml = _ml->_nodecount;
