@@ -11,7 +11,7 @@ class UserFunc():
             loader=FileSystemLoader(join(ROOT, 'template'))
         )
         self.jinja_template = self.jinja_env.get_template(
-            "reg.c"
+            "user_func.c"
         )
 
     def parse(self, root):

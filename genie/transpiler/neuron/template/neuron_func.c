@@ -2,24 +2,15 @@ static void nrn_alloc(Prop* _prop) {
   Prop *prop_ion;
   double *_p;
   Datum *_ppvar;
-  _p = nrn_prop_data_alloc(_mechtype, 19, _prop);
+  _p = nrn_prop_data_alloc(_mechtype, {{ nrn_alloc.param_size }}, _prop);
   /*initialize range parameters*/
 {{ nrn_alloc.init_range_parameter }}
   _prop->param = _p;
-  _prop->param_size = 19;
-  _ppvar = nrn_prop_datum_alloc(_mechtype, 7, _prop);
+  _prop->param_size = {{ nrn_alloc.param_size }};
+  _ppvar = nrn_prop_datum_alloc(_mechtype, {{ nrn_alloc.num_prop_ion }}, _prop);
   _prop->dparam = _ppvar;
   /*connect ionic variables to this model*/
-  prop_ion = need_memb(_na_sym);
-  nrn_promote(prop_ion, 0, 1);
-  _ppvar[0]._pval = &prop_ion->param[0]; /* ena */
-  _ppvar[1]._pval = &prop_ion->param[3]; /* ina */
-  _ppvar[2]._pval = &prop_ion->param[4]; /* _ion_dinadv */
-  prop_ion = need_memb(_k_sym);
-  nrn_promote(prop_ion, 0, 1);
-  _ppvar[3]._pval = &prop_ion->param[0]; /* ek */
-  _ppvar[4]._pval = &prop_ion->param[3]; /* ik */
-  _ppvar[5]._pval = &prop_ion->param[4]; /* _ion_dikdv */
+{{ nrn_alloc.connect_ionic_variables }}
 }
 
 static void nrn_init(_NrnThread* _nt, _Memb_list* _ml, int _type) {

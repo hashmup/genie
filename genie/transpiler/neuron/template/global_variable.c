@@ -1,31 +1,8 @@
 // User defined variables
 #define t _nt->_t
 #define dt _nt->_dt
-#define gnabar _p[0]
-#define gkbar _p[1]
-#define gl _p[2]
-#define el _p[3]
-#define gna _p[4]
-#define gk _p[5]
-#define il _p[6]
-#define m _p[7]
-#define h _p[8]
-#define n _p[9]
-#define Dm _p[10]
-#define Dh _p[11]
-#define Dn _p[12]
-#define ena _p[13]
-#define ek _p[14]
-#define ina _p[15]
-#define ik _p[16]
-#define v _p[17]
-#define _g _p[18]
-#define _ion_ena	*_ppvar[0]._pval
-#define _ion_ina	*_ppvar[1]._pval
-#define _ion_dinadv	*_ppvar[2]._pval
-#define _ion_ek	*_ppvar[3]._pval
-#define _ion_ik	*_ppvar[4]._pval
-#define _ion_dikdv	*_ppvar[5]._pval
+{{ define_params }}
+{{ define_ions }}
 
 #if MAC
 #if !defined(v)
@@ -134,8 +111,7 @@ static const char *_mechanism[] = {
   0,
   0
 };
-static Symbol* _na_sym;
-static Symbol* _k_sym;
+{{ ion_symbol }}
  /* some states have an absolute tolerance */
 static Symbol** _atollist;
 static HocStateTolerance _hoc_state_tol[] = {
