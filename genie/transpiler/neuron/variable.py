@@ -1,3 +1,4 @@
+import re
 from functools import reduce
 from jinja2 import Environment, FileSystemLoader
 from os.path import join, dirname, abspath
@@ -5,6 +6,7 @@ from textx.model import children_of_type, parent_of_type
 
 
 ROOT = abspath(dirname(__file__))
+exponential_exp = re.compile("(?P<b>\d+)e(?P<e>\d+)")
 
 
 class Variable():
@@ -20,6 +22,11 @@ class Variable():
         return {
             "define_params": self.get_define_params(root),
             "define_ions": self.get_define_ions(root),
+            "hoc_parm_limits": self.get_hoc_parm_limits(root),
+            "hoc_parm_units": self.get_hoc_parm_units(root),
+            "hoc_global_param": self.get_hoc_global_param(root),
+            "num_global_param": self.get_num_global_param(root),
+            "define_global_param": self.get_define_global_param(root),
             "ion_symbol": self.get_ion_symbol(root)
         }
 
@@ -64,7 +71,63 @@ class Variable():
             cnt += 1
         return code
 
+    def get_hoc_parm_limits(self, root):
+        code = ""
+        for parm in children_of_type('ParDef', root):
+            if parm.llim and parm.ulim:
+                llim = parm.llim
+                ulim = parm.ulim
+                mllim = exponential_exp.match(parm.llim)
+                mulim = exponential_exp.match(parm.ulim)
+                if mllim:
+                    llim = "{0}e+{1:02d}"\
+                           .format(mllim.group("b"), int(mllim.group("e")))
+                if mulim:
+                    ulim = "{0}e+{1:02d}"\
+                           .format(mulim.group("b"), int(mulim.group("e")))
+                code += "\t\"{0}_{1}\", {2}, {3},\n"\
+                        .format(parm.name, self.filename, llim, ulim)
+        code += "\t\"usetable_{0}\", 0, 1,// TODO: figure out what this is"\
+                "\t0, 0, 0"\
+                .format(self.filename)
+        return code
+
+    def get_hoc_parm_units(self, root):
+        code = ""
+        for assigned in children_of_type('Assigned', root)[0].assigneds:
+            if assigned.unit:
+                code += "\t\"{0}_{1}\", \"{2}\",\n"\
+                    .format(assigned.name, self.filename, assigned.unit)
+        code += "\t0,0"
+        return code
+
+    def get_hoc_global_param(self, root):
+        code = ""
+        for param in children_of_type('Global', root)[0].globals:
+            code += "\t\"{0}_{1}\", &{0}_{1},\n"\
+                    .format(param.name, self.filename)
+        code += "\t\"usetable_{0}\", &usetable_{0},\n"\
+                "\t0, 0"\
+                .format(self.filename)
+        return code
+
+    def get_num_global_param(self, root):
+        params = children_of_type('Global', root)[0].globals
+        return "{0}".format(len(params))
+
+    def get_define_global_param(self, root):
+        code = ""
+        cnt = 0
+        for param in children_of_type('Global', root)[0].globals:
+            code += "#define {0}_{1} _thread1data[{2}]\n"\
+                    "#define {0} _thread[_gth]._pval[{2}]\n"\
+                    .format(param.name, self.filename, cnt)
+            cnt += 1
+        code += "#define usetable usetable_{0}\n".format(self.filename)
+        return code
+
     def compile(self, filename, root):
+        self.filename = filename
         tokens = self.gen(root)
         tokens.update({"filename": filename}.items())
         return self.jinja_template.render(**tokens)

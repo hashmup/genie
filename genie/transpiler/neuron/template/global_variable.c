@@ -32,8 +32,9 @@ extern Memb_func* memb_func;
 
 /* declare global and static user variables */
 static int _thread1data_inuse = 0;
-static double _thread1data[6];
+static double _thread1data[{{ num_global_param }}];
 #define _gth 0
+{{ define_global_param }}
 #define htau_{{ filename }} _thread1data[0]
 #define htau _thread[_gth]._pval[0]
 #define hinf_{{ filename }} _thread1data[1]
@@ -51,35 +52,14 @@ double usetable = 1;
 
 /* some parameters have upper and lower limits */
 static HocParmLimits _hoc_parm_limits[] = {
-  "gl_{{ filename }}", 0, 1e+09,
-  "gkbar_{{ filename }}", 0, 1e+09,
-  "gnabar_{{ filename }}", 0, 1e+09,
-  "usetable_{{ filename }}", 0, 1,
-  0,0,0
+{{ hoc_parm_limits }}
 };
 static HocParmUnits _hoc_parm_units[] = {
-  "mtau_{{ filename }}", "ms",
-  "htau_{{ filename }}", "ms",
-  "ntau_{{ filename }}", "ms",
-  "gnabar_{{ filename }}", "S/cm2",
-  "gkbar_{{ filename }}", "S/cm2",
-  "gl_{{ filename }}", "S/cm2",
-  "el_{{ filename }}", "mV",
-  "gna_{{ filename }}", "S/cm2",
-  "gk_{{ filename }}", "S/cm2",
-  "il_{{ filename }}", "mA/cm2",
-  0,0
+{{ hoc_parm_units }}
 };
 /* connect global user variables to hoc */
 static DoubScal hoc_scdoub[] = {
-  "minf_{{ filename }}", &minf_{{ filename }},
-  "hinf_{{ filename }}", &hinf_{{ filename }},
-  "ninf_{{ filename }}", &ninf_{{ filename }},
-  "mtau_{{ filename }}", &mtau_{{ filename }},
-  "htau_{{ filename }}", &htau_{{ filename }},
-  "ntau_{{ filename }}", &ntau_{{ filename }},
-  "usetable_{{ filename }}", &usetable_{{ filename }},
-  0,0
+{{ hoc_global_param }}
 };
 static DoubVec hoc_vdoub[] = {
   0,0,0
