@@ -17,6 +17,7 @@ class Variable():
         self.jinja_template = self.jinja_env.get_template(
             "global_variable.c"
         )
+        self.version = "6.2.0"
 
     def gen(self, root):
         return {
@@ -27,6 +28,12 @@ class Variable():
             "hoc_global_param": self.get_hoc_global_param(root),
             "num_global_param": self.get_num_global_param(root),
             "define_global_param": self.get_define_global_param(root),
+            "static_global": self.get_static_global(root),
+            "num_states": self.get_num_states(root),
+            "num_cvode": self.get_num_cvode(root),
+            "mechanism": self.get_mechanism(root),
+            "restruct_table": self.get_restruct_table(root),
+            "optimize_table": self.get_optimize_table(root),
             "ion_symbol": self.get_ion_symbol(root)
         }
 
@@ -50,7 +57,7 @@ class Variable():
     def get_ion_symbol(self, root):
         code = ""
         for ion in children_of_type('UseIon', root):
-            code += "\tstatic Symbol* _{0}_sym;\n".format(ion.ion)
+            code += "static Symbol* _{0}_sym;\n".format(ion.ion)
         return code
 
     def get_define_ions(self, root):
@@ -101,6 +108,9 @@ class Variable():
         code += "\t0,0"
         return code
 
+    def get_num_states(self, root):
+        return "{0}".format(len(children_of_type('State', root)[0].state_vars))
+
     def get_hoc_global_param(self, root):
         code = ""
         for param in children_of_type('Global', root)[0].globals:
@@ -116,8 +126,8 @@ class Variable():
         return "{0}".format(len(params))
 
     def get_define_global_param(self, root):
-        code = ""
         cnt = 0
+        code = "#define _gth 0\n"
         for param in children_of_type('Global', root)[0].globals:
             code += "#define {0}_{1} _thread1data[{2}]\n"\
                     "#define {0} _thread[_gth]._pval[{2}]\n"\
@@ -125,6 +135,67 @@ class Variable():
             cnt += 1
         code += "#define usetable usetable_{0}\n".format(self.filename)
         return code
+
+    def get_static_global(self, root):
+        code = ""
+        for param in children_of_type('Global', root)[0].globals:
+            code += "static double *_t_{0};\n".format(param.name)
+        return code
+
+    def get_mechanism(self, root):
+        code = "\t\"{0}\"\n"\
+               "\t\"{1}\"\n"\
+               .format(self.version, self.filename)
+        for parm in children_of_type('Range', root)[0].ranges:
+            code += "\t\"{0}_{1}\",\n"\
+                    .format(parm.name, self.filename)
+        for parm in children_of_type('Nonspecific', root)[0].nonspecifics:
+            code += "\t\"{0}_{1}\",\n"\
+                    .format(parm, self.filename)
+        for parm in children_of_type('State', root)[0].state_vars:
+            code += "\t\"{0}_{1}\",\n"\
+                    .format(parm.name, self.filename)
+        code += "\t0"
+        return code
+
+    def get_restruct_table(self, root):
+        cnt = 0
+        params = children_of_type('Global', root)[0].globals
+        code = "#ifdef RESTRUCT_TABLE\n"\
+               "#define TABLE_SIZE\n"\
+               "FLOAT {0}_table[TABLE_SIZE][{1}];\n"\
+               .format(self.filename, len(params))
+        for param in params:
+            code += "#define TABLE_{0}(x) {1}_table[(x)][{2}]\n"\
+                    .format(param.name.upper(), self.filename, cnt)
+            cnt += 1
+        code += "#else\n"
+        for param in params:
+            code += "#define TABLE_{0}(x) _t_{1}[(x)]\n"\
+                    .format(param.name.upper(), param.name)
+        code += "#endif\n"
+        return code
+
+    def get_optimize_table(self, root):
+        code = ""
+        params = [x.name for x in children_of_type('Range', root)[0].ranges] +\
+            children_of_type('Nonspecific', root)[0].nonspecifics +\
+            [x.name for x in children_of_type('State', root)[0].state_vars] +\
+            ['v', 'g']
+        for param in params:
+            code += "static double _{0}_table[BUFFER_SIZE * MAX_NTHREADS];\n"\
+                    .format(param)
+        # code += "#ifndef KPLUS_WITHOUT_SHARED_CURRENT\n"
+        ions = [[x.r[0].reads[0].name, x.w[0].writes[0].name]
+                for x in children_of_type('UseIon', root)]
+        for ion in reduce(lambda x, y: x+y, ions):
+            code += "static double _{0}_table[BUFFER_SIZE * MAX_NTHREADS];\n"\
+                    .format(ion)
+        # code += "#endif\n"
+        return code
+
+    def get_num_cvode(self, root):
+        return "{0}".format(len(children_of_type('UseIon', root)) * 3)
 
     def compile(self, filename, root):
         self.filename = filename

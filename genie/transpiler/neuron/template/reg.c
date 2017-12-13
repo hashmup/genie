@@ -47,19 +47,7 @@ static void _initlists(){
   if (!_first) {
     return;
   }
-  _slist1[0] = &(m) - _p;
-  _dlist1[0] = &(Dm) - _p;
-  _slist1[1] = &(h) - _p;
-  _dlist1[1] = &(Dh) - _p;
-  _slist1[2] = &(n) - _p;
-  _dlist1[2] = &(Dn) - _p;
-  _t_minf = makevector(201*sizeof(double));
-  _t_mtau = makevector(201*sizeof(double));
-  _t_hinf = makevector(201*sizeof(double));
-  _t_htau = makevector(201*sizeof(double));
-  _t_ninf = makevector(201*sizeof(double));
-  _t_ntau = makevector(201*sizeof(double));
-
+{{ initlists }}
   _first = 0;
 }
 

@@ -21,6 +21,7 @@ class Reg():
             "ion_symbol": self.get_ion_symbol(root),
             "hoc_dparam_size": self.get_hoc_dparam_size(root),
             "help": self.get_help(root),
+            "initlists": self.get_initlists(root),
             "nrn_update_ion_pointer": self.get_nrn_update_ion_pointer(root)
         }
 
@@ -55,6 +56,19 @@ class Reg():
                             cnt * 3 + 1,
                             cnt * 3 + 2)
             cnt += 1
+        return code
+
+    def get_initlists(self, root):
+        code = ""
+        cnt = 0
+        for state in children_of_type('State', root)[0].state_vars:
+            code += "\t_slist1[{0}] = &({1}) - _p;\n"\
+                    "\t_dlist1[{0}] = &(D{1}) - _p;\n"\
+                    .format(cnt, state.name)
+            cnt += 1
+        for param in children_of_type('Global', root)[0].globals:
+            code += "\t_t_{0} = makevector(201 * sizeof(double));\n"\
+                    .format(param.name)
         return code
 
     def compile(self, filename, root):
