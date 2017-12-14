@@ -59,12 +59,7 @@ static void _check_rates(double* _p, Datum* _ppvar, Datum* _thread, _NrnThread* 
     _mfac_rates = 1./_dx;
     for (_i=0, _x=_tmin_rates; _i < 201; _x += _dx, _i++) {
       _f_rates(_p, _ppvar, _thread, _nt, _x);
-      _t_minf[_i] = minf;
-      _t_mtau[_i] = mtau;
-      _t_hinf[_i] = hinf;
-      _t_htau[_i] = htau;
-      _t_ninf[_i] = ninf;
-      _t_ntau[_i] = ntau;
+{{ check_rates }}
     }
     _sav_celsius = celsius;
   }
@@ -85,35 +80,21 @@ static void _n_rates(double* _p, Datum* _ppvar, Datum* _thread, _NrnThread* _nt,
   _xi = _mfac_rates * (_lv - _tmin_rates);
   _i = (int) _xi;
   if (_xi <= 0.) {
-    minf = _t_minf[0];
-    mtau = _t_mtau[0];
-    hinf = _t_hinf[0];
-    htau = _t_htau[0];
-    ninf = _t_ninf[0];
-    ntau = _t_ntau[0];
+{{ n_rates_lt_0 }}
     return;
   }
   if (_i >= 200) {
-    minf = _t_minf[200];
-    mtau = _t_mtau[200];
-    hinf = _t_hinf[200];
-    htau = _t_htau[200];
-    ninf = _t_ninf[200];
-    ntau = _t_ntau[200];
+{{ n_rates_gt_200 }}
     return;
   }
   _theta = _xi - (double)_i;
-  minf = _t_minf[_i] + _theta*(_t_minf[_i+1] - _t_minf[_i]);
-  mtau = _t_mtau[_i] + _theta*(_t_mtau[_i+1] - _t_mtau[_i]);
-  hinf = _t_hinf[_i] + _theta*(_t_hinf[_i+1] - _t_hinf[_i]);
-  htau = _t_htau[_i] + _theta*(_t_htau[_i+1] - _t_htau[_i]);
-  ninf = _t_ninf[_i] + _theta*(_t_ninf[_i+1] - _t_ninf[_i]);
-  ntau = _t_ntau[_i] + _theta*(_t_ntau[_i+1] - _t_ntau[_i]);
+{{ n_rates_global }}
 }
 
 
-static int  _f_rates ( _threadargsprotocomma_ double _lv ) {
-  double _lalpha , _lbeta , _lsum , _lq10;
+static int _f_rates(_threadargsprotocomma_ double _lv ) {
+{{ f_rates }}
+  double _lalpha, _lbeta, _lsum, _lq10;
   _lq10 = pow(3.0 , ((celsius - 6.3 ) / 10.0));
   _lalpha = .1 * vtrap(_threadargscomma_ - (_lv + 40.0), 10.0);
   _lbeta = 4.0 * exp(- (_lv + 65.0) / 18.0);
@@ -148,7 +129,7 @@ static void _hoc_vtrap(void) {
   }
   _thread = _extcall_thread;
   _nt = nrn_threads;
-  _r =  vtrap (_p, _ppvar, _thread, _nt, *getarg(1), *getarg(2));
+  _r =  vtrap(_p, _ppvar, _thread, _nt, *getarg(1), *getarg(2));
   hoc_retpushx(_r);
 }
 
