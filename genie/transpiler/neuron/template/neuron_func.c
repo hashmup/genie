@@ -41,26 +41,7 @@ static void nrn_init(_NrnThread* _nt, _Memb_list* _ml, int _type) {
   _thread = _ml->_thread;
 
   // initialize m,h,n
-  //_m_table = (double *)malloc(BUFFER_SIZE * MAX_NTHREADS * sizeof(double) * 3);
-  //_h_table = _m_table + (BUFFER_SIZE * MAX_NTHREADS);
-  //_n_table = _h_table + (BUFFER_SIZE * MAX_NTHREADS);
-  //_h_table = (double *)malloc(BUFFER_SIZE * MAX_NTHREADS * sizeof(double));
-  //_n_table = (double *)malloc(BUFFER_SIZE * MAX_NTHREADS * sizeof(double));
-  //printf("allocate memory\n");
-
-  double *m_table = &(_m_table[BUFFER_SIZE * _nt->_id]);
-  double *h_table = &(_h_table[BUFFER_SIZE * _nt->_id]);
-  double *n_table = &(_n_table[BUFFER_SIZE * _nt->_id]);
-  double *v_table = &(_v_table[BUFFER_SIZE * _nt->_id]);
-  double *g_table   = &(_g_table[BUFFER_SIZE * _nt->_id]);
-  double *gnabar_table = &(_gnabar_table[BUFFER_SIZE * _nt->_id]);
-  double *gkbar_table = &(_gkbar_table[BUFFER_SIZE * _nt->_id]);
-  double *gl_table  = &(_gl_table[BUFFER_SIZE * _nt->_id]);
-  double *il_table  = &(_il_table[BUFFER_SIZE * _nt->_id]);
-  double *ena_table = &(_ena_table[BUFFER_SIZE * _nt->_id]);
-  double *ek_table  = &(_ek_table[BUFFER_SIZE * _nt->_id]);
-  double *el_table  = &(_el_table[BUFFER_SIZE * _nt->_id]);
-
+{{ nrn_init.link_table }}
   for (_iml = 0; _iml < _cntml; ++_iml) {
     _p = _ml->_data[_iml];
     _ppvar = _ml->_pdata[_iml];
@@ -73,43 +54,15 @@ static void nrn_init(_NrnThread* _nt, _Memb_list* _ml, int _type) {
     initmodel(_p, _ppvar, _thread, _nt);
 
     // initialize m,h,n
-    m_table[_iml] = m;
-    h_table[_iml] = h;
-    n_table[_iml] = n;
-    v_table[_iml] = v;
-    gnabar_table[_iml] = gnabar;
-    gkbar_table[_iml] = gkbar;
-
-    gl_table[_iml] = gl;
-    ena_table[_iml] = _ion_ena;
-    ek_table[_iml] = _ion_ek;
-    el_table[_iml] = el;
+{{ nrn_init.initialize_table }}
   }
 
-#ifdef RESTRUCT_TABLE
-  for (_iml = 0; _iml<TABLE_SIZE; _iml++){
-    TABLE_N_TAU(_iml) = _t_ntau[_iml];
-    TABLE_N_INF(_iml) = _t_ninf[_iml];
-    TABLE_M_TAU(_iml) = _t_mtau[_iml];
-    TABLE_M_INF(_iml) = _t_minf[_iml];
-    TABLE_H_TAU(_iml) = _t_htau[_iml];
-    TABLE_H_INF(_iml) = _t_hinf[_iml];
-  }
-#endif
+{{ nrn_init.restruct_table}}
 }
 
 static void initmodel(double* _p, Datum* _ppvar, Datum* _thread, _NrnThread* _nt) {
-  int _i;
-  double _save;
-  h = h0;
-  m = m0;
-  n = n0;
-  {
-    rates ( _threadargscomma_ v ) ;
-    m = minf ;
-    h = hinf ;
-    n = ninf ;
-  }
+  rates(_threadargscomma_ v);
+{{ nrn_init.initmodel }}
 }
 
 static void nrn_state(_NrnThread* _nt, _Memb_list* _ml, int _type) {
@@ -118,30 +71,13 @@ static void nrn_state(_NrnThread* _nt, _Memb_list* _ml, int _type) {
   int _iml, _cntml;
   double local_dt = dt;
 
-  //static double inftau_table[BUFFER_SIZE*6]; // 6 = {minf, mtau, hinf, htau, ninf, ntau}
-  //double inf_table[BUFFER_SIZE];
-  //double tau_table[BUFFER_SIZE];
   double _theta_table[BUFFER_SIZE];
   int _i_table[BUFFER_SIZE];
-
-  //static double mhn_table[BUFFER_SIZE*3]; // 3 = {m, h, n}
 
   static double local_mfac_rates;
   static double local_tmin_rates;
 
-  double *m_table = &(_m_table[BUFFER_SIZE * _nt->_id]);
-  double *h_table = &(_h_table[BUFFER_SIZE * _nt->_id]);
-  double *n_table = &(_n_table[BUFFER_SIZE * _nt->_id]);
-  const double *v_table = &(_v_table[BUFFER_SIZE * _nt->_id]);
-  const double *g_table   = &(_g_table[BUFFER_SIZE * _nt->_id]);
-  const double *gnabar_table = &(_gnabar_table[BUFFER_SIZE * _nt->_id]);
-  const double *gkbar_table = &(_gkbar_table[BUFFER_SIZE * _nt->_id]);
-  const double *gl_table  = &(_gl_table[BUFFER_SIZE * _nt->_id]);
-  const double *il_table  = &(_il_table[BUFFER_SIZE * _nt->_id]);
-  const double *ena_table = &(_ena_table[BUFFER_SIZE * _nt->_id]);
-  const double *ek_table  = &(_ek_table[BUFFER_SIZE * _nt->_id]);
-  const double *el_table  = &(_el_table[BUFFER_SIZE * _nt->_id]);
-
+{{ nrn_state.link_table }}
 
   _ni = _ml->_nodeindices;
   _cntml = _ml->_nodecount;
@@ -157,9 +93,6 @@ static void nrn_state(_NrnThread* _nt, _Memb_list* _ml, int _type) {
 
 
   double *vec_v = _nt->_actual_v;
-  //int div_iml=0,local_iml;
-  //for(div_iml=0, _iml=0; (div_iml+DIV_BUFFER_SIZE)<_cntml; div_iml+=DIV_BUFFER_SIZE) {
-
 
 #ifdef KPLUS_USE_MOD_OMP
 #pragma omp parallel
@@ -244,34 +177,10 @@ static void nrn_cur(_NrnThread* _nt, _Memb_list* _ml, int _type)
   _ni = _ml->_nodeindices;
   _cntml = _ml->_nodecount;
   _thread = _ml->_thread;
-
-  const double *m_table = &(_m_table[BUFFER_SIZE * _nt->_id]);
-  const double *h_table = &(_h_table[BUFFER_SIZE * _nt->_id]);
-  const double *n_table = &(_n_table[BUFFER_SIZE * _nt->_id]);
-  double *v_table = &(_v_table[BUFFER_SIZE * _nt->_id]);
-  double *g_table   = &(_g_table[BUFFER_SIZE * _nt->_id]);
-  const double *gnabar_table = &(_gnabar_table[BUFFER_SIZE * _nt->_id]);
-  const double *gkbar_table = &(_gkbar_table[BUFFER_SIZE * _nt->_id]);
-  const double *gl_table  = &(_gl_table[BUFFER_SIZE * _nt->_id]);
-  double *il_table  = &(_il_table[BUFFER_SIZE * _nt->_id]);
-  const double *ena_table = &(_ena_table[BUFFER_SIZE * _nt->_id]);
-  const double *ek_table  = &(_ek_table[BUFFER_SIZE * _nt->_id]);
-  const double *el_table  = &(_el_table[BUFFER_SIZE * _nt->_id]);
-
-#ifndef KPLUS_WITHOUT_SHARED_CURRENT
-  double *gna_table = &(_gna_table[BUFFER_SIZE * _nt->_id]);
-  double *gk_table  = &(_gk_table[BUFFER_SIZE * _nt->_id]);
-  double *ina_table = &(_ina_table[BUFFER_SIZE * _nt->_id]);
-  double *ik_table  = &(_ik_table[BUFFER_SIZE * _nt->_id]);
-#endif
+{{ nrn_cur.link_table }}
 
   const double *vec_v = _nt->_actual_v;
   double *vec_rhs = _nt->_actual_rhs;
-
-  //int div_iml=0,local_iml;
-  //for(div_iml=0, _iml=0; (div_iml+DIV_BUFFER_SIZE)<_cntml; div_iml+=DIV_BUFFER_SIZE) {
-  //for (_iml = div_iml, local_iml=0; _iml<div_iml+DIV_BUFFER_SIZE; ++_iml, ++local_iml) {
-
 
 #ifdef KPLUS_WITHOUT_SHARED_CURRENT
 #ifdef KPLUS_USE_MOD_OMP

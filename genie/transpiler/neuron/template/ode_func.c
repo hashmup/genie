@@ -1,15 +1,21 @@
 static int _ode_count(int _type){
-  return {{ num_state }};
+  return {{ num_states }};
 }
 
-static void _ode_map(int _ieq, double** _pv, double** _pvdot, double* _pp, Datum* _ppd, double* _atol, int _type) {
+static void _ode_map(int _ieq,
+                     double** _pv,
+                     double** _pvdot,
+                     double* _pp,
+                     Datum* _ppd,
+                     double* _atol,
+                     int _type) {
   double* _p;
   Datum* _ppvar;
   int _i;
   _p = _pp;
   _ppvar = _ppd;
  	_cvode_ieq = _ieq;
- 	for (_i=0; _i < {{ num_state }}; ++_i) {
+ 	for (_i=0; _i < {{ num_states }}; ++_i) {
  	  _pv[_i] = _pp + _slist1[_i];
     _pvdot[_i] = _pp + _dlist1[_i];
  		_cvode_abstol(_atollist, _atol, _i);
