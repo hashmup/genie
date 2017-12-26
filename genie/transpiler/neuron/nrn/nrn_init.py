@@ -12,6 +12,7 @@ class NrnInit():
             "link_table": self.get_link_table(root),
             "initialize_table": self.get_initialize_table(root),
             "initmodel": self.get_initmodel(root),
+            "read_ions": self.get_read_ions(root),
             "restruct_table": self.get_restruct_table(root)
         }
 
@@ -59,6 +60,13 @@ class NrnInit():
                     .format(param.name.upper(), param.name)
         code += "\t}\n"\
                 "#endif\n"
+        return code
+
+    def get_read_ions(self, root):
+        code = ""
+        for x in children_of_type('UseIon', root):
+            code += "\t\t{0} = _ion_{0};\n"\
+                    .format(x.r[0].reads[0].name)
         return code
 
     def get_initmodel(self, root):

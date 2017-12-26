@@ -48,8 +48,7 @@ static void nrn_init(_NrnThread* _nt, _Memb_list* _ml, int _type) {
 
     _v = VEC_V(_ni[_iml]);
     v = _v;
-    ena = _ion_ena;
-    ek = _ion_ek;
+{{ nrn_init.read_ions }}
 
     initmodel(_p, _ppvar, _thread, _nt);
 
@@ -108,7 +107,6 @@ static void nrn_state(_NrnThread* _nt, _Memb_list* _ml, int _type) {
     double _v = vec_v[_ni[_iml]];
     _i_table[_iml] = (int)(_v - local_tmin_rates);
     _theta_table[_iml] = (_v - local_tmin_rates) - (FLOAT)_i_table[_iml];
-    //v_table[_iml] = _v;
   }
 
 #ifdef KPLUS_USE_MOD_OMP
@@ -117,48 +115,18 @@ static void nrn_state(_NrnThread* _nt, _Memb_list* _ml, int _type) {
 #pragma loop noalias
 #pragma loop norecurrence
   for (_iml = 0; _iml < _cntml; _iml++){
-    if( ! ( _i_table[_iml] >= 200 || _i_table[_iml] < 0.0 ) ){
+    if(!( _i_table[_iml] >= 200 || _i_table[_iml] < 0.0)) {
       ;
-    }else if(_i_table[_iml] >= 200){
-      _theta_table[_iml] = 1.0; _i_table[_iml] = 199;
-    }else if(_i_table[_iml] < 0.0){
-      _theta_table[_iml] = 0.0; _i_table[_iml] = 0;
+    } else if(_i_table[_iml] >= 200) {
+      _theta_table[_iml] = 1.0;
+      _i_table[_iml] = 199;
+    } else if(_i_table[_iml] < 0.0) {
+      _theta_table[_iml] = 0.0;
+      _i_table[_iml] = 0;
     }
   }
 
-#ifdef KPLUS_USE_MOD_OMP
-#pragma omp for
-#endif
-#pragma loop noalias
-#pragma loop norecurrence
-  for (_iml = 0; _iml < _cntml; _iml++){
-    FLOAT tau_n, n_inf, tau_m, m_inf, tau_h, h_inf;
-    int v_i = _i_table[_iml];
-    FLOAT theta = _theta_table[_iml];
-
-    tau_n = TABLE_N_TAU(v_i);
-    n_inf = TABLE_N_INF(v_i);
-    tau_m = TABLE_M_TAU(v_i);
-    m_inf = TABLE_M_INF(v_i);
-    tau_h = TABLE_H_TAU(v_i);
-    h_inf = TABLE_H_INF(v_i);
-    /*
-    tau_n = (tau_n + theta * (TABLE_N_TAU(v_i+1) - tau_n));
-    tau_m = (tau_m + theta * (TABLE_M_TAU(v_i+1) - tau_m));
-    tau_h = (tau_h + theta * (TABLE_H_TAU(v_i+1) - tau_h));
-    n_inf = n_inf + theta * (TABLE_N_INF(v_i+1) - n_inf) - n_table[_iml];
-    m_inf = m_inf + theta * (TABLE_M_INF(v_i+1) - m_inf) - m_table[_iml];
-    h_inf = h_inf + theta * (TABLE_H_INF(v_i+1) - h_inf) - h_table[_iml];
-
-    n_table[_iml] += (1.0f - EXP(-local_dt/tau_n)) * n_inf;
-    m_table[_iml] += (1.0f - EXP(-local_dt/tau_m)) * m_inf;
-    h_table[_iml] += (1.0f - EXP(-local_dt/tau_h)) * h_inf;
-    */
-    n_table[_iml] += (1.0f - EXP(-local_dt/tau_n)) * (n_inf + theta * (TABLE_N_INF(v_i+1) - n_inf) - n_table[_iml]);
-    m_table[_iml] += (1.0f - EXP(-local_dt/tau_m)) * (m_inf + theta * (TABLE_M_INF(v_i+1) - m_inf) - m_table[_iml]);
-    h_table[_iml] += (1.0f - EXP(-local_dt/tau_h)) * (h_inf + theta * (TABLE_H_INF(v_i+1) - h_inf) - h_table[_iml]);
-  }
-
+{{ nrn_state.calc_table }}
   }
 }
 
@@ -181,75 +149,9 @@ static void nrn_cur(_NrnThread* _nt, _Memb_list* _ml, int _type)
 
   const double *vec_v = _nt->_actual_v;
   double *vec_rhs = _nt->_actual_rhs;
-
-#ifdef KPLUS_WITHOUT_SHARED_CURRENT
-#ifdef KPLUS_USE_MOD_OMP
-#pragma omp parallel
-#endif
-  {
-
-#ifdef KPLUS_USE_MOD_OMP
-#pragma omp for
-#endif
-#pragma loop noalias
-#pragma loop norecurrence
-  for(_iml=0; _iml<_cntml; _iml++){
-    v_table[_iml] = vec_v[_ni[_iml]];
-  }
-
-#ifdef KPLUS_USE_MOD_OMP
-#pragma omp for
-#endif
-#pragma loop noalias
-#pragma loop norecurrence
-  for(_iml=0; _iml<_cntml; _iml++){
-    double _gna, _gk, _ina, _ik;
-    _gna = gnabar_table[_iml] * m_table[_iml] * m_table[_iml] * m_table[_iml] * h_table[_iml];
-    _gk = gkbar_table[_iml] * n_table[_iml] * n_table[_iml] * n_table[_iml] * n_table[_iml];
-    g_table[_iml] = _gna + _gk + gl_table[_iml];
-
-    _ina = _gna * (v_table[_iml] - ena_table[_iml]);
-    _ik = _gk * (v_table[_iml] - ek_table[_iml]);
-    il_table[_iml] = gl_table[_iml] * (v_table[_iml] - el_table[_iml]) + _ina + _ik;
-  }
-
-#ifdef KPLUS_USE_MOD_OMP
-#pragma omp for
-#endif
-  for(_iml=0; _iml<_cntml; _iml++){
-    vec_rhs[_ni[_iml]] -= il_table[_iml];
-  }
-
-  }
+{{ nrn_cur.break_point_without_current }}
 #else
-  for(_iml=0; _iml<_cntml; ++_iml){
-    v_table[_iml] = vec_v[_ni[_iml]];
-  }
-  for(_iml=0; _iml<_cntml; ++_iml){
-    gna_table[_iml]
-      = gnabar_table[_iml] * m_table[_iml] * m_table[_iml] * m_table[_iml] * h_table[_iml];
-    gk_table[_iml]
-      = gkbar_table[_iml] * n_table[_iml] * n_table[_iml] * n_table[_iml] * n_table[_iml];
-    g_table[_iml] = gna_table[_iml] + gk_table[_iml] + gl_table[_iml];
-  }
-  for(_iml=0; _iml<_cntml; ++_iml){
-    ina_table[_iml] = gna_table[_iml] * (v_table[_iml] - ena_table[_iml]);
-    ik_table[_iml]  = gk_table[_iml] * (v_table[_iml] - ek_table[_iml]);
-    il_table[_iml] = gl_table[_iml] * (v_table[_iml] - el_table[_iml]);
-    il_table[_iml] += ina_table[_iml] + ik_table[_iml];
-  }
-  for(_iml=0; _iml<_cntml; ++_iml){
-    vec_rhs[_ni[_iml]] -= il_table[_iml];
-  }
-
-  for(_iml=0; _iml<_cntml; ++_iml){
-    double* _p = _ml->_data[_iml];
-    Datum* _ppvar = _ml->_pdata[_iml];
-    _ion_dinadv += gna_table[_iml]; // pp
-    _ion_dikdv  += gk_table[_iml];  // pp
-    _ion_ina    += ina_table[_iml]; // pp
-    _ion_ik     += ik_table[_iml];  // pp
-  }
+{{ nrn_cur.break_point }}
 #endif
 
 #ifdef KPLUS_USE_FAPP_RANGE

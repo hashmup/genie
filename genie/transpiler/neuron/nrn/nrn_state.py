@@ -9,7 +9,8 @@ class NrnState():
 
     def gen(self, root):
         return {
-            "link_table": self.get_link_table(root)
+            "link_table": self.get_link_table(root),
+            "calc_table": self.get_calc_table(root)
         }
 
     def get_link_table(self, root):
@@ -30,4 +31,26 @@ class NrnState():
                     " &(_{0}_table[BUFFER_SIZE * _nth->_id]);\n"\
                     .format(ion)
         # code += "#endif\n"
+        return code
+
+    def get_calc_table(self, root):
+        code = "#ifdef KPLUS_USE_MOD_OMP\n"\
+               "#pragma omp for\n"\
+               "#endif\n"\
+               "#pragma loop noalias\n"\
+               "#pragma loop norecurrence\n"\
+               "\tfor (_iml = 0; _iml < _cntml; _iml++) {\n"
+        for param in children_of_type('Global', root)[0].globals:
+            code += "\t\tFLOAT {0};\n".format(param.name)
+        code += "\t\tint v_i = _i_table[_iml];\n"\
+                "\t\tFLOAT theta = _theta_table[_iml];\n"
+        for param in children_of_type('Global', root)[0].globals:
+            code += "\t\t{0} = TABLE_{1}(v_i);\n"\
+                    .format(param.name, param.name.upper())
+        for state in children_of_type('State', root)[0].state_vars:
+            code += "\t\t{0}_table[_iml] += (1.0f - EXP(-local_dt/{0}tau))"\
+                    " * ({0}inf + theta * (TABLE_{1}INF(v_i + 1) - {0}inf)"\
+                    " - {0}_table[_iml]);\n"\
+                    .format(state.name, state.name.upper())
+        code += "\t}\n"
         return code
