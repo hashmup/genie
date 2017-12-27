@@ -1,11 +1,11 @@
 import os
-from neuron.neuron_func import NeuronFunc
-from neuron.ode import ODE
-from neuron.reg import Reg
-from neuron.user_func import UserFunc
-from neuron.variable import Variable
-from parser.lems import LemsCompTypeGenerator
-from fileutil import *
+from .neuron.neuron_func import NeuronFunc
+from .neuron.ode import ODE
+from .neuron.reg import Reg
+from .neuron.user_func import UserFunc
+from .neuron.variable import Variable
+from .parser.lems import LemsCompTypeGenerator
+from .fileutil import *
 from os.path import join, dirname, abspath
 from jinja2 import Environment, FileSystemLoader
 
@@ -13,7 +13,7 @@ from jinja2 import Environment, FileSystemLoader
 ROOT = abspath(dirname(__file__))
 
 
-class Transpiler():
+class Compiler():
     def __init__(self):
         self.jinja_env = Environment(
             loader=FileSystemLoader(join(ROOT, 'neuron/template'))
