@@ -1,3 +1,4 @@
+import sys
 from xml.etree.ElementTree import Element, tostring
 from xml.dom.minidom import parseString
 from textx.model import children_of_type, parent_of_type
@@ -9,7 +10,10 @@ from .lems_helpers import ComponentTypeHelper, ComponentHelper
 class LemsCompTypeGenerator(NModlCompiler):
 
     def __init__(self):
-        super().__init__()
+        if sys.version_info <= (2, 7):
+            NModlCompiler.__init__(self)
+        else:
+            super().__init__()
         self.L = ComponentTypeHelper()
         self.mm.register_model_processor(self.add_block_bodies)
         self.mm.register_model_processor(self.add_derivatives)
