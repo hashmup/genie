@@ -12,10 +12,14 @@ class Environment():
         """
         # k: if k_accountj exists
         test_k = self.shell.execute("k_accountj", [], [], "")[0]
+        if type(test_k) is bytes:
+            test_k = test_k.decode('utf-8')
         if test_k != '':
             return "k"
 
         test_os = self.shell.execute("uname", [], [], "")[0].lower().rstrip()
+        if type(test_os) is bytes:
+            test_os = test_os.decode('utf-8')
         if test_os == 'darwin':
             return "osx"
         if test_os == 'linux':
