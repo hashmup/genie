@@ -20,3 +20,8 @@ run: clean
 
 compile:
 	python genie/transpiler_test.py
+
+push: clean
+	git add -A
+	git commit
+	git push origin master

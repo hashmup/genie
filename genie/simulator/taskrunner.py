@@ -1,7 +1,7 @@
 import re
 import time
 from ..utils.shell import Shell
-from summarizer import Summarizer
+from .summarizer import Summarizer
 from collections import defaultdict
 import pandas as pd
 import threading

@@ -1,4 +1,4 @@
-from generator import Generator
+from .generator import Generator
 from ..utils.fileutil import *
 
 

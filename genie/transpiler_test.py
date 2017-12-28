@@ -1,4 +1,4 @@
-from transpiler.compiler import Compiler
+from .transpiler.compiler import Compiler
 
 
 def main():

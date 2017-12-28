@@ -1,7 +1,7 @@
-from configparser import ConfigParser
-from buildprocessor import BuildProcessor
-from jobprocessor import JobProcessor
-from taskrunner import TaskRunner
+from .configparser import ConfigParser
+from .buildprocessor import BuildProcessor
+from .jobprocessor import JobProcessor
+from .taskrunner import TaskRunner
 from ..utils.env import Environment
 
 

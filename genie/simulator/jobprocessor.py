@@ -1,5 +1,5 @@
 from collections import defaultdict
-from jobgenerator import JobGenerator
+from .jobgenerator import JobGenerator
 from ..utils.env import Environment
 
 
