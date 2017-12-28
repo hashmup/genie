@@ -25,6 +25,8 @@ class Environment():
         if test_os == 'linux':
             # centos + ubuntu
             test_linux = self.shell.execute("lsb_release", [], ['-a'], "")[0]
+            if type(test_linux) is bytes:
+                test_linux = test_linux.decode('utf-8')
             exp = re.compile("Distributor ID:\t(?P<os>\w+)\n")
             index = test_linux.find("Distributor")
             if index == -1:
