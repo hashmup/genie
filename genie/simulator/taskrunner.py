@@ -64,6 +64,8 @@ class TaskRunner:
 
     def is_job_still_running(self, job_id):
         res = self.shell.execute("qstat", [], [], "")
+        if type(res) is bytes:
+            res = res.decode('utf-8')
         job_lines = res[0].split('\n')
         if len(job_lines) > 2:
             for line in job_lines[2:]:
@@ -227,6 +229,8 @@ class TaskRunner:
                 [],
                 "{0}/hoc".format(self.neuron_path)
             )
+            if type(res) is bytes:
+                res = res.decode('utf-8')
             m = id_cluster_exp.match(res[0])
             return m.group("id")
         if self.environment == "k":
@@ -236,6 +240,8 @@ class TaskRunner:
                 [],
                 "{0}/hoc".format(self.neuron_path)
             )
+            if type(res) is bytes:
+                res = res.decode('utf-8')
             m = id_k_exp.match(res[0])
             return m.group("id")
 
