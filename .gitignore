@@ -4,3 +4,4 @@ neuron_kplus/
 tmp/
 __pycache__/
 example/x86_64/
+.pyenv-version

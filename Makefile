@@ -1,6 +1,8 @@
 all: run
 pull:
 	bash scripts/pull.sh
+install:
+	bash scripts/setup_libraries.sh
 clean-pyc:
 	rm -rf *.pyc
 	rm -rf *.pyo
