@@ -11,6 +11,7 @@ class JobGenerator(Generator):
         tmp = self.contents[self.job_name]['template'].render(
             nodes=params['nodes'],
             ppn=params['ppn'],
+            proc=int(params['nodes']) * int(params['ppn']),
             modules=params['modules'],
             omp_num_threads=params['omp_num_threads'],
             nrniv=params['nrniv'],
