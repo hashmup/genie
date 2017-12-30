@@ -27,3 +27,5 @@ push: clean
 	git add -A
 	git commit
 	git push origin master
+rsync: clean
+	rsync -vra -e "ssh -p 22" --delete neuron_kplus/ k:~/genie/neuron_kplus/
