@@ -63,10 +63,10 @@ class TaskRunner:
             print(self.result_table)
 
     def is_job_still_running(self, job_id):
-        res = self.shell.execute("qstat", [], [], "")
+        res = self.shell.execute("qstat", [], [], "")[0]
         if type(res) is bytes:
             res = res.decode('utf-8')
-        job_lines = res[0].split('\n')
+        job_lines = res.split('\n')
         if len(job_lines) > 2:
             for line in job_lines[2:]:
                 m = job_exp.match(line)
@@ -228,10 +228,10 @@ class TaskRunner:
                 ["../../genie/simulator/tmp/job_cluster.sh"],
                 [],
                 "{0}/hoc".format(self.neuron_path)
-            )
+            )[0]
             if type(res) is bytes:
                 res = res.decode('utf-8')
-            m = id_cluster_exp.match(res[0])
+            m = id_cluster_exp.match(res)
             return m.group("id")
         if self.environment == "k":
             res = self.shell.execute(
@@ -239,10 +239,10 @@ class TaskRunner:
                 ["../../genie/simulator/tmp/job_k.sh"],
                 [],
                 "{0}/hoc".format(self.neuron_path)
-            )
+            )[0]
             if type(res) is bytes:
                 res = res.decode('utf-8')
-            m = id_k_exp.match(res[0])
+            m = id_k_exp.match(res)
             return m.group("id")
 
     def deploy(self, shouldBuild):
