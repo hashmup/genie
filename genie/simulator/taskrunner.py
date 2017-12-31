@@ -44,9 +44,9 @@ class TaskRunner:
             self.current_build_param = build_param
             self.running_jobs.append(job_id)
             merge_params =\
-                dict(build_param.items() +
-                     job_param.items() +
-                     {"job_id": job_id, "time": 0}.items())
+                dict(**build_param,
+                     **job_param,
+                     **{"job_id": job_id, "time": 0})
             print(merge_params)
             for key in merge_params.keys():
                 if isinstance(merge_params[key], defaultdict) or\

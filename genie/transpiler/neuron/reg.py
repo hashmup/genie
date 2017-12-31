@@ -48,9 +48,9 @@ class Reg():
         code = ""
         cnt = 0
         for ion in children_of_type('UseIon', root):
-            code += "\tnrn_update_ion_pointer(_{0}_sym, __ppvar, {1}, 0)"\
-                    "\tnrn_update_ion_pointer(_{0}_sym, __ppvar, {2}, 3)"\
-                    "\tnrn_update_ion_pointer(_{0}_sym, __ppvar, {3}, 4)"\
+            code += "\tnrn_update_ion_pointer(_{0}_sym, __ppvar, {1}, 0);\n"\
+                    "\tnrn_update_ion_pointer(_{0}_sym, __ppvar, {2}, 3);\n"\
+                    "\tnrn_update_ion_pointer(_{0}_sym, __ppvar, {3}, 4);\n"\
                     .format(ion.ion,
                             cnt * 3,
                             cnt * 3 + 1,
