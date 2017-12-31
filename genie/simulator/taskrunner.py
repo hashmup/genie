@@ -120,25 +120,25 @@ class TaskRunner:
                 "command": "make",
                 "args": ["clean"],
                 "options": [],
-                "work_dir": "{0}/nrn-7.2".format(self.neuron_path)
+                "work_dir": "{0}/nrn-7.3".format(self.neuron_path)
             },
                 {
                 "command": "../../genie/simulator/tmp/build_config.sh",
                 "args": [],
                 "options": [],
-                "work_dir": "{0}/nrn-7.2".format(self.neuron_path)
+                "work_dir": "{0}/nrn-7.3".format(self.neuron_path)
             },
                 {
                 "command": "make",
                 "args": [],
                 "options": [],
-                "work_dir": "{0}/nrn-7.2".format(self.neuron_path)
+                "work_dir": "{0}/nrn-7.3".format(self.neuron_path)
             },
                 {
                 "command": "make",
                 "args": ["install"],
                 "options": [],
-                "work_dir": "{0}/nrn-7.2".format(self.neuron_path)
+                "work_dir": "{0}/nrn-7.3".format(self.neuron_path)
             },
                 {
                 "command": "./make_special_x86_64.sh",
