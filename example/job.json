@@ -25,7 +25,7 @@
     },
     "job" : {
         "job_cluster": {
-            "nodes":"2",
+            "nodes":"1",
             "ppn":"2,28,1",
             "modules": [
             ],
