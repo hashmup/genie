@@ -39,6 +39,7 @@ class TaskRunner:
 
     def deploy_job(self):
         if len(self.pending_jobs) > 0:
+            self.lock.acquire()
             build_param, job_param = self.pending_jobs.pop(0)
             job_id = self.deploy(self.current_build_param != build_param)
             self.current_build_param = build_param
@@ -60,6 +61,7 @@ class TaskRunner:
                     self.result_table.loc[-1, key] = merge_params[key]
             self.result_table.index = self.result_table.index + 1
             self.result_table = self.result_table.sort_index()
+            self.lock.release()
             print(self.result_table)
 
     def is_job_still_running(self, job_id):
