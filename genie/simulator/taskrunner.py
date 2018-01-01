@@ -33,20 +33,21 @@ class TaskRunner:
         self.lock = threading.Lock()
         self.deployCommand = DeployCommand(neuron_path)
 
-    def push_job(self, build_param, job_param):
-        self.pending_jobs.append([build_param, job_param])
+    def push_job(self, build_param, job_param, is_bench):
+        self.pending_jobs.append([build_param, job_param, is_bench])
 
     def deploy_job(self):
         if len(self.pending_jobs) > 0:
             self.lock.acquire()
-            build_param, job_param = self.pending_jobs.pop(0)
-            job_id = self.deploy(self.current_build_param != build_param)
+            build_param, job_param, is_bench = self.pending_jobs.pop(0)
+            job_id = self.deploy(self.current_build_param != build_param,
+                                 is_bench)
             self.current_build_param = build_param
             self.running_jobs.append(job_id)
             merge_params =\
                 dict(**build_param,
                      **job_param,
-                     **{"job_id": job_id, "time": 0})
+                     **{"job_id": job_id, "bench": is_bench, "time": 0})
             print(merge_params)
             for key in merge_params.keys():
                 if isinstance(merge_params[key], defaultdict) or\
@@ -114,7 +115,7 @@ class TaskRunner:
                 self.deploy_job()
                 self.current_job_num += 1
 
-    def deploy(self, shouldBuild):
+    def deploy(self, shouldBuild, is_bench):
         if shouldBuild:
-            self.deployCommand.build(self.environment, False)
+            self.deployCommand.build(self.environment, is_bench)
         return self.deployCommand.run(self.environment)

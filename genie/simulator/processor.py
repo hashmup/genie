@@ -19,16 +19,19 @@ class Processor():
         config = ConfigParser(path).parse()
         return config['build'], config['job']
 
-    def run_(self):
+    def run_(self, is_bench):
         self.taskRunner.push_job(
             self.buildProcessor.cur_params(),
-            self.jobProcessor.cur_params()
+            self.jobProcessor.cur_params(),
+            is_bench
         )
 
     def run(self):
-        while self.buildProcessor.has_next():
-            self.buildProcessor.process()
-            self.jobProcessor.init()
-            while self.jobProcessor.has_next():
-                self.jobProcessor.process()
-                self.run_()
+        for is_bench in [True, False]:
+            self.buildProcessor.init()
+            while self.buildProcessor.has_next():
+                self.buildProcessor.process()
+                self.jobProcessor.init()
+                while self.jobProcessor.has_next():
+                    self.jobProcessor.process()
+                    self.run_(is_bench)
