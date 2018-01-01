@@ -6,6 +6,10 @@ pullIfNotExist() {
         mkdir -p neuron_kplus/nrn-7.2/src/npy25
         mkdir -p neuron_kplus/nrn-7.2/src/npy26
         mkdir -p neuron_kplus/nrn-7.2/src/npy27
+    else
+        (cd neuron_kplus &&
+        git checkout . &&
+        git pull origin master)
     fi
 }
 pullIfNotExist
