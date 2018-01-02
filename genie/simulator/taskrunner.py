@@ -5,6 +5,7 @@ from .summarizer import Summarizer
 from .verifier import Verifier
 from .deploycommand import DeployCommand
 from collections import defaultdict
+from compiler import Compiler
 import pandas as pd
 import threading
 
@@ -29,6 +30,7 @@ class TaskRunner:
         self.current_build_param = None
         self.shell = Shell()
         self.summarizer = Summarizer()
+        self.compiler = Compiler()
         self.verifier = Verifier()
         self.environment = environment
         self.result_table = pd.DataFrame()
@@ -123,5 +125,6 @@ class TaskRunner:
 
     def deploy(self, shouldBuild, is_bench):
         if shouldBuild:
+            self.compiler.gen("neuron_kplus/mod/hh_k.mod")
             self.deployCommand.build(self.environment, is_bench)
         return self.deployCommand.run(self.environment)
