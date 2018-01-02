@@ -26,48 +26,6 @@ class Summarizer:
         self.clean_up(job_type, job_id)
         return time
 
-    def check_correctness(self, filename):
-        f = open(filename)
-        _lines = f.readlines()
-        f.close()
-        lines = _lines[:12]
-        start = {}
-        end = {}
-        spike = {}
-        maxid = 0
-        for line in _lines:
-            m = start_exp.match(line)
-            if m:
-                pid = int(m.group("pid"))
-                start[pid] = line
-                maxid = max(maxid, pid)
-                continue
-            m = spike_exp.match(line)
-            if m:
-                pid = int(m.group("pid"))
-                idvec = int(m.group("idvec"))
-                if pid in spike:
-                    spike[pid][idvec] = line
-                else:
-                    spike[pid] = {}
-                    spike[pid][idvec] = line
-                continue
-            m = end_exp.match(line)
-            if m:
-                pid = int(m.group("pid"))
-                end[pid] = line
-        if maxid > 0:
-            maxid += 1
-        for pid in range(maxid):
-            lines.append(start[pid])
-            for line in spike[pid]:
-                lines.append(spike[pid][line])
-            lines.append(end[pid])
-        f = open("sort_{0}".format(filename), 'w')
-        for line in lines:
-            f.write(line)
-        f.close()
-
     def obtain_time(self, filename):
         f = open("{0}{1}".format(dir_path, filename))
         lines = f.readlines()
@@ -83,13 +41,12 @@ class Summarizer:
     def clean_up(self, job_type, job_id):
         self.shell.execute(
             "mkdir",
-            "tmp",
-            ["-p"],
-            dir_path
+            ["tmp"],
+            ["-p"]
         )
         self.shell.execute(
             "cp",
-            "job_{0}.sh.o{1} ../../tmp/".format(job_type, job_id),
+            ["job_{0}.sh.o{1} ../../tmp/".format(job_type, job_id)],
             [],
             dir_path
         )

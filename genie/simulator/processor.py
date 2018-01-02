@@ -3,6 +3,7 @@ from .buildprocessor import BuildProcessor
 from .jobprocessor import JobProcessor
 from .taskrunner import TaskRunner
 from ..utils.env import Environment
+from .verifier import Verifier
 
 
 class Processor():
@@ -12,6 +13,7 @@ class Processor():
         self.buildProcessor = BuildProcessor(build)
         self.jobProcessor = JobProcessor(job)
         self.taskRunner = TaskRunner(self.env.get_env(), neuron_path)
+        self.verifier = Verifier()
         self.run()
         self.taskRunner.run()
 
@@ -35,3 +37,7 @@ class Processor():
                 while self.jobProcessor.has_next():
                     self.jobProcessor.process()
                     self.run_(is_bench)
+        if self.verifier.verify():
+            print("Correct!")
+        else:
+            print("Incorrect :(")

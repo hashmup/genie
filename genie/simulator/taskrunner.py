@@ -82,7 +82,7 @@ class TaskRunner:
         print("test")
         self.lock.acquire()
         print(self.running_jobs)
-        print(len(self.running_jobs))
+        print(len(self.running_jobs), len(self.pending_jobs))
         for i in range(len(self.running_jobs)):
             if not self.is_job_still_running(self.running_jobs[i]):
                 print("complete {0}".format(self.running_jobs[i]))
