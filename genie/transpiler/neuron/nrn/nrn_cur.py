@@ -1,7 +1,7 @@
 import re
 from functools import reduce
 from collections import defaultdict
-from transpiler.optimizer import Optimizer
+from transpiler.neuron.optimizer import Optimizer
 from textx.model import children_of_type, parent_of_type
 
 
