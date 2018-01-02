@@ -1,5 +1,5 @@
 import re
-from ..utils.shell import Shell
+from utils.shell import Shell
 
 id_cluster_exp = re.compile("(?P<id>[0-9]+).\w+.\w+")
 id_k_exp = re.compile("(?P<id>[0-9]+).\w+.\w+")

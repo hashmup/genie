@@ -1,5 +1,5 @@
 import re
-from .shell import Shell
+from utils.shell import Shell
 
 
 class Environment():

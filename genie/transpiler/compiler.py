@@ -1,11 +1,11 @@
 import os
-from .neuron.neuron_func import NeuronFunc
-from .neuron.ode import ODE
-from .neuron.reg import Reg
-from .neuron.user_func import UserFunc
-from .neuron.variable import Variable
-from .parser.lems import LemsCompTypeGenerator
-from .fileutil import *
+from transpiler.neuron.neuron_func import NeuronFunc
+from transpiler.neuron.ode import ODE
+from transpiler.neuron.reg import Reg
+from transpiler.neuron.user_func import UserFunc
+from transpiler.neuron.variable import Variable
+from transpiler.parser.lems import LemsCompTypeGenerator
+from utils.fileutil import *
 from os.path import join, dirname, abspath
 from jinja2 import Environment, FileSystemLoader
 

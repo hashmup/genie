@@ -1,11 +1,11 @@
 import re
 import time
-from ..utils.shell import Shell
-from .summarizer import Summarizer
-from .verifier import Verifier
-from .deploycommand import DeployCommand
+from utils.shell import Shell
+from simulator.summarizer import Summarizer
+from simulator.verifier import Verifier
+from simulator.deploycommand import DeployCommand
 from collections import defaultdict
-from compiler import Compiler
+from transpiler.compiler import Compiler
 import pandas as pd
 import threading
 

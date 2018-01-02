@@ -1,9 +1,9 @@
 from jinja2 import Environment, FileSystemLoader
 from os.path import join, dirname, abspath
-from .nrn.nrn_alloc import NrnAlloc
-from .nrn.nrn_cur import NrnCur
-from .nrn.nrn_init import NrnInit
-from .nrn.nrn_state import NrnState
+from transpiler.nrn.nrn_alloc import NrnAlloc
+from transpiler.nrn.nrn_cur import NrnCur
+from transpiler.nrn.nrn_init import NrnInit
+from transpiler.nrn.nrn_state import NrnState
 
 
 ROOT = abspath(dirname(__file__))

@@ -1,4 +1,4 @@
-from ..utils.shell import Shell
+from utils.shell import Shell
 from os import listdir
 from os.path import isfile, join
 import re

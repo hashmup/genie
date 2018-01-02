@@ -1,8 +1,8 @@
-from .configparser import ConfigParser
-from .buildprocessor import BuildProcessor
-from .jobprocessor import JobProcessor
-from .taskrunner import TaskRunner
-from ..utils.env import Environment
+from simulator.configparser import ConfigParser
+from simulator.buildprocessor import BuildProcessor
+from simulator.jobprocessor import JobProcessor
+from simulator.taskrunner import TaskRunner
+from utils.env import Environment
 
 
 class Processor():

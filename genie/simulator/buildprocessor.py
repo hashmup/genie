@@ -1,5 +1,5 @@
 from collections import defaultdict
-from .buildgenerator import BuildGenerator
+from simulator.buildgenerator import BuildGenerator
 
 
 class BuildProcessor():

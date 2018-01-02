@@ -1,5 +1,5 @@
-from .generator import Generator
-from ..utils.fileutil import *
+from simulator.generator import Generator
+from utils.fileutil import *
 
 
 class JobGenerator(Generator):
