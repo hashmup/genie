@@ -82,6 +82,18 @@ class Summarizer:
 
     def clean_up(self, job_type, job_id):
         self.shell.execute(
+            "mkdir",
+            "tmp",
+            ["-p"],
+            dir_path
+        )
+        self.shell.execute(
+            "cp",
+            "job_{0}.sh.o{1} ../../tmp/".format(job_type, job_id),
+            [],
+            dir_path
+        )
+        self.shell.execute(
             "rm",
             [
                 "job_{0}.sh.o{1}".format(job_type, job_id),
