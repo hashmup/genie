@@ -13,6 +13,7 @@ clean-dir:
 clean-log:
 	rm -rf neuron_kplus/hoc/job_*.sh.*
 	rm -rf result.csv
+	rm -rf tmp
 clean-cache:
 	rm -rf __pycache__
 clean:  clean-dir clean-pyc clean-log

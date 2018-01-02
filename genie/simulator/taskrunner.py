@@ -95,10 +95,14 @@ class TaskRunner:
                 del self.running_jobs[i]
                 break
         self.lock.release()
-        if len(self.pending_jobs):
+        if len(self.running_jobs) == 0 and len(self.pending_jobs) != 0:
             print(self.pending_jobs)
-        if len(self.running_jobs):
-            print(self.running_jobs)
+            if self.verifier.verify():
+                print("correct")
+            self.result_table.to_csv("result.csv")
+            self.timer_cancel()
+            return
+
         if len(self.pending_jobs) == 0 and len(self.running_jobs) == 0:
             print('verifyyyyy')
             if self.verifier.verify():
