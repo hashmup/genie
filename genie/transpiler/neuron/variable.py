@@ -94,7 +94,7 @@ class Variable():
                            .format(mulim.group("b"), int(mulim.group("e")))
                 code += "\t\"{0}_{1}\", {2}, {3},\n"\
                         .format(parm.name, self.filename, llim, ulim)
-        code += "\t\"usetable_{0}\", 0, 1,// TODO: figure out what this is"\
+        code += "\t\"usetable_{0}\", 0, 1,// TODO: figure out what this is\n"\
                 "\t0, 0, 0"\
                 .format(self.filename)
         return code

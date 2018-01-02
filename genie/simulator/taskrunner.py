@@ -113,15 +113,25 @@ class TaskRunner:
         t = threading.Thread(target=self.watch_job)
         t.start()
         while len(self.pending_jobs) != 0:
-            if self.current_job_num > self.MAX_NUM_JOBS:
+            self.lock.acquire()
+            num = self.current_job_num
+            self.release()
+            if num > self.MAX_NUM_JOBS:
                 time.sleep(20)
-            while self.current_job_num < self.MAX_NUM_JOBS:
+            while True:
+                self.lock.acquire()
+                num = self.current_job_num
+                self.release()
+                if num >= self.MAX_NUM_JOBS:
+                    break
                 print(self.running_jobs)
                 print(self.current_job_num,
                       len(self.pending_jobs),
                       len(self.running_jobs))
                 self.deploy_job()
+                self.lock.acquire()
                 self.current_job_num += 1
+                self.lock.release()
 
     def deploy(self, shouldBuild, is_bench):
         if shouldBuild:
