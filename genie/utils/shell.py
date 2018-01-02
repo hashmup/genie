@@ -18,7 +18,7 @@ class Shell:
                 command["work_dir"]
             )
 
-    def execute(self, command, args, options, work_dir):
+    def execute(self, command, args, options, work_dir=''):
         """
         " Run: command args in work_dir
         " ex. (ls, ["../"], [-a]) => ls ../ -a
