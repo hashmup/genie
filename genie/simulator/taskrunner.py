@@ -121,7 +121,7 @@ class TaskRunner:
             while True:
                 self.lock.acquire()
                 num = self.current_job_num
-                self.release()
+                self.lock.release()
                 if num >= self.MAX_NUM_JOBS:
                     break
                 print(self.running_jobs)
