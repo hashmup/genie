@@ -2,6 +2,7 @@ import re
 import time
 from ..utils.shell import Shell
 from .summarizer import Summarizer
+from .verifier import Verifier
 from .deploycommand import DeployCommand
 from collections import defaultdict
 import pandas as pd
@@ -28,6 +29,7 @@ class TaskRunner:
         self.current_build_param = None
         self.shell = Shell()
         self.summarizer = Summarizer()
+        self.verifier = Verifier()
         self.environment = environment
         self.result_table = pd.DataFrame()
         self.lock = threading.Lock()
@@ -95,6 +97,10 @@ class TaskRunner:
                 break
         self.lock.release()
         if len(self.pending_jobs) == 0 and len(self.running_jobs) == 0:
+            if self.verifier.verify():
+                print("Correct!")
+            else:
+                print("Incorrect :(")
             self.result_table.to_csv("result.csv")
             self.timer_.cancel()
             return
