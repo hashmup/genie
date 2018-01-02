@@ -115,7 +115,7 @@ class TaskRunner:
         while len(self.pending_jobs) != 0:
             self.lock.acquire()
             num = self.current_job_num
-            self.release()
+            self.lock.release()
             if num > self.MAX_NUM_JOBS:
                 time.sleep(20)
             while True:
