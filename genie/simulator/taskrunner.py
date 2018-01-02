@@ -52,7 +52,6 @@ class TaskRunner:
                 dict(**build_param,
                      **job_param,
                      **{"job_id": job_id, "bench": is_bench, "time": 0})
-            print(merge_params)
             for key in merge_params.keys():
                 if isinstance(merge_params[key], defaultdict) or\
                         isinstance(merge_params[key], list):
@@ -85,8 +84,6 @@ class TaskRunner:
     def watch_job(self):
         print("test")
         self.lock.acquire()
-        print(self.running_jobs)
-        print(len(self.running_jobs), len(self.pending_jobs))
         for i in range(len(self.running_jobs)):
             if not self.is_job_still_running(self.running_jobs[i]):
                 print("complete {0}".format(self.running_jobs[i]))
@@ -99,6 +96,7 @@ class TaskRunner:
                 break
         self.lock.release()
         if len(self.pending_jobs) == 0 and len(self.running_jobs) == 0:
+            print('verifyyyyy')
             if self.verifier.verify():
                 print("Correct!")
             else:
@@ -132,6 +130,10 @@ class TaskRunner:
                 self.lock.acquire()
                 self.current_job_num += 1
                 self.lock.release()
+        print('aaaaaa')
+        print(self.pending_jobs)
+        print(self.running_jobs)
+        print('yyyyyyy')
 
     def deploy(self, shouldBuild, is_bench):
         if shouldBuild:
