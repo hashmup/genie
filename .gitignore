@@ -6,3 +6,4 @@ __pycache__/
 example/x86_64/
 .python-version
 result.csv
+*.swp
