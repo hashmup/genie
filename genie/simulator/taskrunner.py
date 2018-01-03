@@ -97,14 +97,6 @@ class TaskRunner:
                 del self.running_jobs[i]
                 break
         self.lock.release()
-        if len(self.running_jobs) == 0 and len(self.pending_jobs) != 0\
-                and self.complete:
-            print(self.pending_jobs)
-            if self.verifier.verify():
-                print("correct")
-            self.result_table.to_csv("result.csv")
-            self.timer_cancel()
-            return
 
         if len(self.pending_jobs) == 0 and len(self.running_jobs) == 0\
                 and self.complete:
@@ -134,18 +126,14 @@ class TaskRunner:
                 self.lock.release()
                 if num >= self.MAX_NUM_JOBS:
                     break
-                print(self.running_jobs)
-                print(self.current_job_num,
-                      len(self.pending_jobs),
-                      len(self.running_jobs))
+                # print(self.running_jobs)
+                # print(self.current_job_num,
+                #       len(self.pending_jobs),
+                #       len(self.running_jobs))
                 self.deploy_job()
                 self.lock.acquire()
                 self.current_job_num += 1
                 self.lock.release()
-        print('aaaaaa')
-        print(self.pending_jobs)
-        print(self.running_jobs)
-        print('yyyyyyy')
 
     def deploy(self, shouldBuild, is_bench):
         if shouldBuild:
