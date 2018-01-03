@@ -31,12 +31,12 @@ class Verifier():
         return len(s) == 1
 
     def sort_and_hash_log(self, lines):
-        lines = []
+        _lines = []
         start = {}
         end = {}
         spike = {}
         maxid = 0
-        for line in _lines:
+        for line in lines:
             m = start_exp.match(line)
             if m:
                 pid = int(m.group("pid"))
@@ -60,8 +60,8 @@ class Verifier():
         if maxid > 0:
             maxid += 1
         for pid in range(maxid):
-            lines.append(start[pid])
+            _lines.append(start[pid])
             for line in spike[pid]:
-                lines.append(spike[pid][line])
-                lines.append(end[pid])
-        return hash(tuple(lines))
+                _lines.append(spike[pid][line])
+                _lines.append(end[pid])
+        return hash(tuple(_lines))
