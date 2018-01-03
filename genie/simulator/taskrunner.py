@@ -36,6 +36,7 @@ class TaskRunner:
         self.result_table = pd.DataFrame()
         self.lock = threading.Lock()
         self.deployCommand = DeployCommand(neuron_path)
+        self.complete = False
 
     def push_job(self, build_param, job_param, is_bench):
         self.pending_jobs.append([build_param, job_param, is_bench])
@@ -92,10 +93,12 @@ class TaskRunner:
                                                self.running_jobs[i])
                 key = self.result_table['job_id'] == self.running_jobs[i]
                 self.result_table.loc[key, 'time'] = time
+                self.complete = True
                 del self.running_jobs[i]
                 break
         self.lock.release()
-        if len(self.running_jobs) == 0 and len(self.pending_jobs) != 0:
+        if len(self.running_jobs) == 0 and len(self.pending_jobs) != 0\
+                and self.complete:
             print(self.pending_jobs)
             if self.verifier.verify():
                 print("correct")
@@ -103,7 +106,8 @@ class TaskRunner:
             self.timer_cancel()
             return
 
-        if len(self.pending_jobs) == 0 and len(self.running_jobs) == 0:
+        if len(self.pending_jobs) == 0 and len(self.running_jobs) == 0\
+                and self.complete:
             print('verifyyyyy')
             if self.verifier.verify():
                 print("Correct!")

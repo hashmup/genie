@@ -28,6 +28,7 @@ class Processor():
 
     def run(self):
         for is_bench in [True, False]:
+            print("call Processor.run")
             self.buildProcessor.init()
             while self.buildProcessor.has_next():
                 self.buildProcessor.process()
