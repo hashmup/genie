@@ -1,3 +1,4 @@
+import inspect
 from simulator.configparser import ConfigParser
 from simulator.buildprocessor import BuildProcessor
 from simulator.jobprocessor import JobProcessor
@@ -26,7 +27,30 @@ class Processor():
             is_bench
         )
 
+
+    def caller_name(self,skip=2):
+        stack = inspect.stack()
+        start = 0 + skip
+        if len(stack) < start + 1:
+            return ''
+        parentframe = stack[start][0]
+        name = []
+        module = inspect.getmodule(parentframe)
+        if module:
+            name.append(module.__name__)
+        if 'self' in parentframe.f_locals:
+            name.append(parentframe.f_locals['self'].__class__.__name__)
+        codename = parentframe.f_code.co_name
+        if codename != '<module>':  # top level usually
+            name.append( codename ) # function or a method
+        del parentframe
+        return ".".join(name)
+
     def run(self):
+        s = inspect.stack()
+        print("me", inspect.stack()[1][3])
+        print("module", inspect.getmodulename(s[1][1]))
+        print("dad", self.caller_name())
         for is_bench in [True, False]:
             print("call Processor.run")
             self.buildProcessor.init()
