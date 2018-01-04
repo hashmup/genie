@@ -4,6 +4,7 @@ from simulator.buildprocessor import BuildProcessor
 from simulator.jobprocessor import JobProcessor
 from simulator.taskrunner import TaskRunner
 from utils.env import Environment
+from utils.shell import Shell
 
 
 class Processor():
@@ -12,6 +13,7 @@ class Processor():
         build, job = self.parseConfigFile(config_path)
         self.buildProcessor = BuildProcessor(build)
         self.jobProcessor = JobProcessor(job)
+        self.shell = Shell()
         self.setup(neuron_path)
         self.taskRunner = TaskRunner(self.env.get_env(), neuron_path)
 
@@ -74,15 +76,15 @@ class Processor():
         # we need to do this so that we don't have to wait
         # while we are building, o/w we cannot deploy a job
         # we need to copy neuron_kplus/nrn-7.x and neuron_kplus/specials
-        nrn_path = "{0}/nrn-7.2"
-        specials_path = "{0}/specials"
-        self.shell.execute(
+        nrn_path = "{0}/nrn-7.2".format(neuron_path)
+        specials_path = "{0}/specials".format(neuron_path)
+        print(self.shell.execute(
             "cp",
             [nrn_path, "{0}.tmp".format(nrn_path)],
             ["-r"]
-        )
-        self.shell.execute(
+        ))
+        print(self.shell.execute(
             "cp",
             [specials_path, "{0}.tmp".format(specials_path)],
             ["-r"]
-        )
+        ))
