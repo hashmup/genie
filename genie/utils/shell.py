@@ -55,5 +55,5 @@ class Shell:
     def make_cmd(self, command, args, options):
         return "{0} {1} {2}".format(
             command,
-            self.parse_args(args),
-            self.parse_options(options))
+            self.parse_options(options),
+            self.parse_args(args))

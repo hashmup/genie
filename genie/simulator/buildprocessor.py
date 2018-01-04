@@ -9,6 +9,7 @@ class BuildProcessor():
         self.build_generator = BuildGenerator()
         self.make_table()
         self.done = False
+        self.use_tmp = False  # We use both original and tmp
 
     def make_table_(self, dict_):
         for k in dict_:
@@ -58,8 +59,8 @@ class BuildProcessor():
 
     def process(self):
         params = self.cur_params()
-        self.build_generator.gen(params)
-
+        self.build_generator.gen(params, self.use_tmp)
+        self.use_tmp = not self.use_tmp
         # proceed by 1
         for k in self.index_table:
             if k not in self.build_table or k in self.not_iterate:

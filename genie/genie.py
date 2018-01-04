@@ -20,4 +20,5 @@ class Genie():
 
     def run(self):
         if self.check_config():
-            self.processor = Processor(self.args.config, self.neuron_path)
+            processor = Processor(self.args.config, self.neuron_path)
+            processor.run()
