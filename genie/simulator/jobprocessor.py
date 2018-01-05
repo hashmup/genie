@@ -11,6 +11,7 @@ class JobProcessor():
         self.job_generator = JobGenerator(self.job_name)
         self.build_table()
         self.done = False
+        self.curry = False
 
     def build_table(self):
         self.job_table = defaultdict(dict)
@@ -35,16 +36,42 @@ class JobProcessor():
             params[k] = self.job_table[k][self.index_table[k]]
         return params
 
+    def curry_by_one(self, curry_index):
+        keys = list(self.index_table.keys())
+        for j in range(curry_index + 1):
+            self.index_table[keys[j]] = 0
+        if curry_index + 1 == len(keys):
+            self.done = True
+            return
+        j = curry_index + 1
+        while j < len(keys) and len(self.job_table[keys[j]]) <= 1:
+            j += 1
+        if j < len(keys):
+            if self.index_table[keys[j]] == len(self.job_table[keys[j]]) - 1:
+                # self.curry = True
+                self.curry_by_one(j)
+            else:
+                self.index_table[keys[j]] += 1
+        else:
+            self.done = True
+
     def process(self):
         params = self.cur_params()
         self.job_generator.gen(params)
 
         # proceed by 1
-        for k in self.index_table:
-            if self.index_table[k] < len(self.job_table[k]) - 1:
-                self.index_table[k] += 1
+        # if self.curry:
+        #     self.curry = False
+        #     return
+        keys = list(self.index_table.keys())
+        for i in range(len(keys)):
+            if self.index_table[keys[i]] < len(self.job_table[keys[i]]):
+                if self.index_table[keys[i]] ==\
+                        len(self.job_table[keys[i]]) - 1:
+                    self.curry_by_one(i)
+                    return
+                self.index_table[keys[i]] += 1
                 return
-        self.done = True
 
     def rangestr2array(self, rangestr):
         # if given str is already array then just return it.

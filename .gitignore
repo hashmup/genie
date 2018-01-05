@@ -7,3 +7,4 @@ example/x86_64/
 .python-version
 result.csv
 *.swp
+tests/.ipynb_checkpoints/
