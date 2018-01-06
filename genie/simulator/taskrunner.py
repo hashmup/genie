@@ -102,7 +102,7 @@ class TaskRunner:
                 time = self.summarizer.summary(self.environment,
                                                self.running_jobs[i])
                 key = self.result_table['job_id'] == self.running_jobs[i]
-                if self.first or self.cnt = 0:
+                if self.first or self.cnt == 0:
                     self.result_table.loc[key, 'time'] = time
                 else:
                     self.result_table.loc[key, 'time'] += time
