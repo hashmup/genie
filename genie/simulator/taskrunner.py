@@ -7,6 +7,7 @@ from simulator.deploycommand import DeployCommand
 from collections import defaultdict
 from transpiler.compiler import Compiler
 import pandas as pd
+import numpy as np
 import threading
 
 job_exp = re.compile(
@@ -26,7 +27,9 @@ class TaskRunner:
     def __init__(self, environment, neuron_path):
         self.current_job_num = 0
         self.pending_jobs = []
+        self.pending_jobs_bak = []
         self.running_jobs = []
+        self.candidate_jobs = defaultdict(dict)
         self.current_build_param = None
         self.shell = Shell()
         self.summarizer = Summarizer()
@@ -37,6 +40,8 @@ class TaskRunner:
         self.lock = threading.Lock()
         self.deployCommand = DeployCommand(neuron_path)
         self.complete = False
+        self.first = True
+        self.cnt = 0
 
     def push_job(self, build_param, job_param, is_bench):
         self.pending_jobs.append([build_param, job_param, is_bench])
@@ -47,6 +52,11 @@ class TaskRunner:
             build_param, job_param, is_bench = self.pending_jobs.pop(0)
             job_id = self.deploy(self.current_build_param != build_param,
                                  is_bench)
+            # record params for future use
+            self.candidate_jobs[job_id]["build_param"] = build_param
+            self.candidate_jobs[job_id]["job_param"] = job_param
+            self.candidate_jobs[job_id]["is_bench"] = is_bench
+
             self.current_build_param = build_param
             self.running_jobs.append(job_id)
             merge_params =\
@@ -92,7 +102,10 @@ class TaskRunner:
                 time = self.summarizer.summary(self.environment,
                                                self.running_jobs[i])
                 key = self.result_table['job_id'] == self.running_jobs[i]
-                self.result_table.loc[key, 'time'] = time
+                if self.first or self.cnt = 0:
+                    self.result_table.loc[key, 'time'] = time
+                else:
+                    self.result_table.loc[key, 'time'] += time
                 self.complete = True
                 del self.running_jobs[i]
                 break
@@ -105,9 +118,29 @@ class TaskRunner:
                 print("Correct!")
             else:
                 print("Incorrect :(")
-            self.result_table.to_csv("result.csv")
-            self.timer_.cancel()
-            return
+            if self.first:
+                self.result_table.to_csv("result_all.csv")
+                self.timer_.cancel()
+                self.first = False
+                sorted_table = self.result_table.sort_values(by="time")\
+                    .reset_index(drop=True)
+                for i in range(int(len(sorted_table) / 4.0)):
+                    job_id = sorted_table['job_id'][i]
+                    build = self.candidate_jobs[job_id]["build_param"]
+                    job = self.candidate_jobs[job_id]["job_param"]
+                    is_bench = self.candidate_jobs[job_id]["is_bench"]
+                    self.pending_jobs_bak\
+                        .append([build_param, job_param, is_bench])
+                self.result_table = pd.DataFrame()
+            elif self.cnt < 3:
+                self.cnt += 1
+            else:
+                self.result_table['avg_time'] = self.result_table['time'] / 3.0
+                self.result_table.to_csv("result_candidate.csv")
+                self.timer_.cancel()
+                return
+            self.pending_jobs = self.pending_jobs_bak
+            self.run()
         self.timer_ = threading.Timer(20.0, self.watch_job)
         self.timer_.start()
 
