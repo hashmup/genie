@@ -59,7 +59,7 @@ class Processor():
                 while self.jobProcessor.has_next():
                     self.jobProcessor.process()
                     self.run_(is_bench)
-        self.taskRunner.run()
+        # self.taskRunner.run()
 
     def setup(self, neuron_path):
         """

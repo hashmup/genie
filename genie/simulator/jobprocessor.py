@@ -36,20 +36,20 @@ class JobProcessor():
             params[k] = self.job_table[k][self.index_table[k]]
         return params
 
-    def curry_by_one(self, curry_index):
+    def carry_by_one(self, carry_index):
         keys = list(self.index_table.keys())
-        for j in range(curry_index + 1):
+        for j in range(carry_index + 1):
             self.index_table[keys[j]] = 0
-        if curry_index + 1 == len(keys):
+        if carry_index + 1 == len(keys):
             self.done = True
             return
-        j = curry_index + 1
+        j = carry_index + 1
         while j < len(keys) and len(self.job_table[keys[j]]) <= 1:
             j += 1
         if j < len(keys):
             if self.index_table[keys[j]] == len(self.job_table[keys[j]]) - 1:
-                # self.curry = True
-                self.curry_by_one(j)
+                # self.carry = True
+                self.carry_by_one(j)
             else:
                 self.index_table[keys[j]] += 1
         else:
@@ -68,7 +68,7 @@ class JobProcessor():
             if self.index_table[keys[i]] < len(self.job_table[keys[i]]):
                 if self.index_table[keys[i]] ==\
                         len(self.job_table[keys[i]]) - 1:
-                    self.curry_by_one(i)
+                    self.carry_by_one(i)
                     return
                 self.index_table[keys[i]] += 1
                 return

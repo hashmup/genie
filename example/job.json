@@ -29,10 +29,10 @@
             "ppn":"2,28,1",
             "modules": [
             ],
-            "omp_num_threads": "2,16,2",
+            "omp_num_threads": "1,16,1",
             "nrniv": "../specials/x86_64/special -mpi",
             "hoc_name": "../hoc/bench_main.hoc",
-            "stop_time": 500,
+            "stop_time": 100,
             "nthread": 16,
             "prof": ""
         },
