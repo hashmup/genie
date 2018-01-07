@@ -55,29 +55,31 @@ class TaskRunner:
             build_param, job_param, is_bench = self.pending_jobs.pop(0)
             job_id = self.deploy(self.current_build_param != build_param,
                                  is_bench)
-            # record params for future use
-            self.candidate_jobs[job_id]["build_param"] = build_param
-            self.candidate_jobs[job_id]["job_param"] = job_param
-            self.candidate_jobs[job_id]["is_bench"] = is_bench
+            if self.first:
+                # record params for future use
+                self.candidate_jobs[job_id]["build_param"] = build_param
+                self.candidate_jobs[job_id]["job_param"] = job_param
+                self.candidate_jobs[job_id]["is_bench"] = is_bench
 
             self.current_build_param = build_param
             self.running_jobs.append(job_id)
-            merge_params =\
-                dict(**build_param,
-                     **job_param,
-                     **{"job_id": job_id, "bench": is_bench, "time": 0})
-            for key in merge_params.keys():
-                if isinstance(merge_params[key], defaultdict) or\
-                        isinstance(merge_params[key], list):
-                    if key not in self.result_table:
-                        self.result_table.loc[-1, key] = 0
-                    self.result_table[key] =\
-                        self.result_table[key].astype('object')
-                    self.result_table.set_value(-1, key, merge_params[key])
-                else:
-                    self.result_table.loc[-1, key] = merge_params[key]
-            self.result_table.index = self.result_table.index + 1
-            self.result_table = self.result_table.sort_index()
+            if self.first or self.cnt == 0:
+                merge_params =\
+                    dict(**build_param,
+                         **job_param,
+                        **{"job_id": job_id, "bench": is_bench, "time": 0})
+                for key in merge_params.keys():
+                    if isinstance(merge_params[key], defaultdict) or\
+                            isinstance(merge_params[key], list):
+                        if key not in self.result_table:
+                            self.result_table.loc[-1, key] = 0
+                        self.result_table[key] =\
+                            self.result_table[key].astype('object')
+                        self.result_table.set_value(-1, key, merge_params[key])
+                    else:
+                        self.result_table.loc[-1, key] = merge_params[key]
+                self.result_table.index = self.result_table.index + 1
+                self.result_table = self.result_table.sort_index()
             self.lock.release()
            # print(self.result_table)
 
@@ -106,9 +108,12 @@ class TaskRunner:
                                                self.running_jobs[i])
                 key = self.result_table['job_id'] == self.running_jobs[i]
                 if self.first or self.cnt == 0:
-                    self.result_table.loc[key, 'time'] = time
+                    self.result_table.loc[key, 'time'][0] = time
                 else:
-                    self.result_table.loc[key, 'time'] += time
+                    print(self.result_table.loc[key, 'time'][0])
+                    self.result_table.loc[key, 'time'][0] += time
+                    print(time)
+                    print(self.result_table.loc[key, 'time'][0])
                 self.complete = True
                 del self.running_jobs[i]
                 break
@@ -128,25 +133,30 @@ class TaskRunner:
                 sorted_table = self.result_table.sort_values(by="time")\
                     .reset_index(drop=True)
                 self.job_total_num = 0
+                print(sorted_table)
+                print(len(sorted_table))
                 for i in range(int(len(sorted_table) / 4.0)):
                     job_id = sorted_table['job_id'][i]
                     build = self.candidate_jobs[job_id]["build_param"]
                     job = self.candidate_jobs[job_id]["job_param"]
                     is_bench = self.candidate_jobs[job_id]["is_bench"]
-                    self.pending_jobs_bak\
-                        .append([build, job, is_bench])
+                    self.pending_jobs_bak.append([build, job, is_bench])
                     self.job_total_num += 1
+                print(self.pending_jobs_bak)
                 self.result_table = pd.DataFrame()
             elif self.cnt < 3:
                 self.timer_.cancel()
                 self.cnt += 1
+                print(self.pending_jobs)
+                print(self.pending_jobs_bak)
             else:
                 self.result_table['avg_time'] = self.result_table['time'] / 3.0
                 self.result_table.to_csv("result_candidate.csv")
                 self.timer_.cancel()
                 return
-            self.pending_jobs = self.pending_jobs_bak
+            self.pending_jobs = self.pending_jobs_bak[:]
             self.run()
+            return
         self.timer_ = threading.Timer(20.0, self.watch_job)
         self.timer_.start()
 
