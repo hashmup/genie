@@ -108,12 +108,12 @@ class TaskRunner:
                                                self.running_jobs[i])
                 key = self.result_table['job_id'] == self.running_jobs[i]
                 if self.first or self.cnt == 0:
-                    self.result_table.loc[key, 'time'][0] = time
+                    self.result_table.loc[key, 'time'] = time
                 else:
-                    print(self.result_table.loc[key, 'time'][0])
-                    self.result_table.loc[key, 'time'][0] += time
+                    print("before", self.result_table.loc[key, 'time'].values)
+                    self.result_table.loc[key, 'time'] += time
                     print(time)
-                    print(self.result_table.loc[key, 'time'][0])
+                    print("after", self.result_table.loc[key, 'time'].values)
                 self.complete = True
                 del self.running_jobs[i]
                 break
