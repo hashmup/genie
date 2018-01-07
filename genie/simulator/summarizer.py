@@ -39,19 +39,13 @@ class Summarizer:
                 return time
 
     def clean_up(self, job_type, job_id):
-        print(self.shell.execute(
-            "mkdir",
-            ["../../tmp/"],
-            ["-p"],
-            dir_path
-        ))
-        print(self.shell.execute(
+        self.shell.execute(
             "cp",
             ["job_{0}.sh.o{1} ../../tmp/".format(job_type, job_id)],
             [],
             dir_path
-        ))
-        print(self.shell.execute(
+        )
+        self.shell.execute(
             "rm",
             [
                 "job_{0}.sh.o{1}".format(job_type, job_id),
@@ -59,4 +53,4 @@ class Summarizer:
             ],
             ["-f"],
             dir_path
-        ))
+        )

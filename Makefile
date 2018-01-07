@@ -20,6 +20,8 @@ clean-dir:
 clean-log:
 	rm -rf neuron_kplus/hoc/job_*.sh.*
 	rm -rf result.csv
+	rm -rf result_all.csv
+	rm -rf result_candidate.csv
 	rm -rf tmp
 
 clean-cache:

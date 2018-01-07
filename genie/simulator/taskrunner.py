@@ -6,6 +6,7 @@ from simulator.verifier import Verifier
 from simulator.deploycommand import DeployCommand
 from collections import defaultdict
 from transpiler.compiler import Compiler
+from datetime import datetime
 import pandas as pd
 import numpy as np
 import threading
@@ -42,9 +43,11 @@ class TaskRunner:
         self.complete = False
         self.first = True
         self.cnt = 0
+        self.job_total_num = 0
 
     def push_job(self, build_param, job_param, is_bench):
         self.pending_jobs.append([build_param, job_param, is_bench])
+        self.job_total_num += 1
 
     def deploy_job(self):
         if len(self.pending_jobs) > 0:
@@ -76,7 +79,7 @@ class TaskRunner:
             self.result_table.index = self.result_table.index + 1
             self.result_table = self.result_table.sort_index()
             self.lock.release()
-            print(self.result_table)
+           # print(self.result_table)
 
     def is_job_still_running(self, job_id):
         res = self.shell.execute("qstat", [], [], "")[0]
@@ -93,11 +96,11 @@ class TaskRunner:
         return True
 
     def watch_job(self):
-        print("test")
+        print("{0}/{1} {2}".format(self.job_total_num - len(self.pending_jobs), self.job_total_num, str(datetime.now())))
         self.lock.acquire()
         for i in range(len(self.running_jobs)):
             if not self.is_job_still_running(self.running_jobs[i]):
-                print("complete {0}".format(self.running_jobs[i]))
+                #print("complete {0}".format(self.running_jobs[i]))
                 self.current_job_num -= 1
                 time = self.summarizer.summary(self.environment,
                                                self.running_jobs[i])
@@ -124,13 +127,15 @@ class TaskRunner:
                 self.first = False
                 sorted_table = self.result_table.sort_values(by="time")\
                     .reset_index(drop=True)
+                self.job_total_num = 0
                 for i in range(int(len(sorted_table) / 4.0)):
                     job_id = sorted_table['job_id'][i]
                     build = self.candidate_jobs[job_id]["build_param"]
                     job = self.candidate_jobs[job_id]["job_param"]
                     is_bench = self.candidate_jobs[job_id]["is_bench"]
                     self.pending_jobs_bak\
-                        .append([build_param, job_param, is_bench])
+                        .append([build, job, is_bench])
+                    self.job_total_num += 1
                 self.result_table = pd.DataFrame()
             elif self.cnt < 3:
                 self.cnt += 1
