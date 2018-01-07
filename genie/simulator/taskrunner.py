@@ -63,10 +63,10 @@ class TaskRunner:
                 self.candidate_jobs[job_id]["is_bench"] = is_bench
             else:
                 for key in self.candidate_jobs:
-                    if self.candidate_jobs[key]["build_param"] == build_param
-                    and self.candidate_jobs[key]["job_param"] == job_param
-                    and self.candidate_jobs[key]["is_bench"] == is_bench:
-                        self.relation_table[job_id] = key
+                    if self.candidate_jobs[key]["build_param"] == build_param\
+                        and self.candidate_jobs[key]["job_param"] == job_param\
+                        and self.candidate_jobs[key]["is_bench"] == is_bench:
+                            self.relation_table[job_id] = key
             self.current_build_param = build_param
             self.running_jobs.append(job_id)
             if self.first or self.cnt == 0:
