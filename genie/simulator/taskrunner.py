@@ -133,6 +133,7 @@ class TaskRunner:
                         .append([build_param, job_param, is_bench])
                 self.result_table = pd.DataFrame()
             elif self.cnt < 3:
+                self.timer_.cancel()
                 self.cnt += 1
             else:
                 self.result_table['avg_time'] = self.result_table['time'] / 3.0
