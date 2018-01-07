@@ -39,6 +39,7 @@ class TaskRunner:
         self.environment = environment
         self.result_table = pd.DataFrame()
         self.lock = threading.Lock()
+        self.relation_table = defaultdict(dict)
         self.deployCommand = DeployCommand(neuron_path)
         self.complete = False
         self.first = True
@@ -60,14 +61,19 @@ class TaskRunner:
                 self.candidate_jobs[job_id]["build_param"] = build_param
                 self.candidate_jobs[job_id]["job_param"] = job_param
                 self.candidate_jobs[job_id]["is_bench"] = is_bench
-
+            else:
+                for key in self.candidate_jobs:
+                    if self.candidate_jobs[key]["build_param"] == build_param
+                    and self.candidate_jobs[key]["job_param"] == job_param
+                    and self.candidate_jobs[key]["is_bench"] == is_bench:
+                        self.relation_table[job_id] = key
             self.current_build_param = build_param
             self.running_jobs.append(job_id)
             if self.first or self.cnt == 0:
                 merge_params =\
                     dict(**build_param,
                          **job_param,
-                        **{"job_id": job_id, "bench": is_bench, "time": 0})
+                         **{"job_id": job_id, "bench": is_bench, "time": 0})
                 for key in merge_params.keys():
                     if isinstance(merge_params[key], defaultdict) or\
                             isinstance(merge_params[key], list):
@@ -81,7 +87,6 @@ class TaskRunner:
                 self.result_table.index = self.result_table.index + 1
                 self.result_table = self.result_table.sort_index()
             self.lock.release()
-           # print(self.result_table)
 
     def is_job_still_running(self, job_id):
         res = self.shell.execute("qstat", [], [], "")[0]
@@ -98,15 +103,20 @@ class TaskRunner:
         return True
 
     def watch_job(self):
-        print("{0}/{1} {2}".format(self.job_total_num - len(self.pending_jobs), self.job_total_num, str(datetime.now())))
+        print("{0}/{1} {2}".format(self.job_total_num - len(self.pending_jobs),
+                                   self.job_total_num, str(datetime.now())))
         self.lock.acquire()
         for i in range(len(self.running_jobs)):
             if not self.is_job_still_running(self.running_jobs[i]):
-                #print("complete {0}".format(self.running_jobs[i]))
+                # print("complete {0}".format(self.running_jobs[i]))
                 self.current_job_num -= 1
                 time = self.summarizer.summary(self.environment,
                                                self.running_jobs[i])
-                key = self.result_table['job_id'] == self.running_jobs[i]
+                if self.first:
+                    key = self.result_table['job_id'] == self.running_jobs[i]
+                else:
+                    key = self.result_table['job_id'] ==\
+                          self.relation_table[self.running_jobs[i]]
                 if self.first or self.cnt == 0:
                     self.result_table.loc[key, 'time'] = time
                 else:
@@ -133,17 +143,16 @@ class TaskRunner:
                 sorted_table = self.result_table.sort_values(by="time")\
                     .reset_index(drop=True)
                 self.job_total_num = 0
-                print(sorted_table)
-                print(len(sorted_table))
+                self.result_table = pd.DataFrame()
                 for i in range(int(len(sorted_table) / 4.0)):
                     job_id = sorted_table['job_id'][i]
                     build = self.candidate_jobs[job_id]["build_param"]
                     job = self.candidate_jobs[job_id]["job_param"]
                     is_bench = self.candidate_jobs[job_id]["is_bench"]
+                    self.result_table[i] = self.sorted_table[i]
                     self.pending_jobs_bak.append([build, job, is_bench])
                     self.job_total_num += 1
                 print(self.pending_jobs_bak)
-                self.result_table = pd.DataFrame()
             elif self.cnt < 3:
                 self.timer_.cancel()
                 self.cnt += 1
