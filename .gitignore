@@ -8,3 +8,4 @@ example/x86_64/
 result.csv
 *.swp
 tests/.ipynb_checkpoints/
+analyze/.ipynb_checkpoints/

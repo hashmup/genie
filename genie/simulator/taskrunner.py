@@ -63,11 +63,13 @@ class TaskRunner:
                 self.candidate_jobs[job_id]["is_bench"] = is_bench
             else:
                 for key in self.candidate_jobs:
-                    if self.candidate_jobs[key]["build_param"] == build_param\
-                        and self.candidate_jobs[key]["job_param"] == job_param\
-                        and self.candidate_jobs[key]["is_bench"] == is_bench:
-                            print(job_id, key)
-                            self.relation_table[job_id] = key
+                    build = self.candidate_jobs[key]["build_param"]
+                    job = self.candidate_jobs[key]["job_param"]
+                    bench = self.candidate_jobs[key]["is_bench"]
+                    if build == build_param\
+                        and job == job_param\
+                            and bench == is_bench:
+                                self.relation_table[job_id] = key
             self.current_build_param = build_param
             self.running_jobs.append(job_id)
             if self.first:
@@ -122,10 +124,7 @@ class TaskRunner:
                 if self.first:
                     self.result_table.loc[key, 'time'] = time
                 else:
-                    print("before", self.result_table.loc[key, 'time'].values)
                     self.result_table.loc[key, 'time'] += time
-                    print(time)
-                    print("after", self.result_table.loc[key, 'time'].values)
                 self.complete = True
                 del self.running_jobs[i]
                 break
@@ -145,8 +144,11 @@ class TaskRunner:
                 sorted_table = self.result_table.sort_values(by="time")\
                     .reset_index(drop=True)
                 self.job_total_num = 0
-                self.result_table = pd.DataFrame(columns = sorted_table.columns)
-                self.result_table = pd.concat([self.result_table, sorted_table[:int(len(sorted_table) / 4.0)]])
+                self.result_table =\
+                    pd.DataFrame(columns=sorted_table.columns)
+                self.result_table = pd.concat(
+                    [self.result_table,
+                     sorted_table[:int(len(sorted_table) / 4.0)]])
                 for i in range(int(len(sorted_table) / 4.0)):
                     job_id = sorted_table['job_id'][i]
                     build = self.candidate_jobs[job_id]["build_param"]
@@ -154,12 +156,9 @@ class TaskRunner:
                     is_bench = self.candidate_jobs[job_id]["is_bench"]
                     self.pending_jobs_bak.append([build, job, is_bench])
                     self.job_total_num += 1
-                print(self.pending_jobs_bak)
             elif self.cnt < 3:
                 self.timer_.cancel()
                 self.cnt += 1
-                print(self.pending_jobs)
-                print(self.pending_jobs_bak)
             else:
                 self.result_table['avg_time'] = self.result_table['time'] / 4.0
                 self.result_table.to_csv("result_candidate.csv")
