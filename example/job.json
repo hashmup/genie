@@ -26,7 +26,7 @@
     "job" : {
         "job_cluster": {
             "nodes":"1",
-            "ppn":"26,28,1",
+            "ppn":"27,28,1",
             "modules": [
             ],
             "omp_num_threads": "14,16,1",

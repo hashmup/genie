@@ -66,10 +66,11 @@ class TaskRunner:
                     if self.candidate_jobs[key]["build_param"] == build_param\
                         and self.candidate_jobs[key]["job_param"] == job_param\
                         and self.candidate_jobs[key]["is_bench"] == is_bench:
+                            print(job_id, key)
                             self.relation_table[job_id] = key
             self.current_build_param = build_param
             self.running_jobs.append(job_id)
-            if self.first or self.cnt == 0:
+            if self.first:
                 merge_params =\
                     dict(**build_param,
                          **job_param,
@@ -117,7 +118,8 @@ class TaskRunner:
                 else:
                     key = self.result_table['job_id'] ==\
                           self.relation_table[self.running_jobs[i]]
-                if self.first or self.cnt == 0:
+                    print(key)
+                if self.first:
                     self.result_table.loc[key, 'time'] = time
                 else:
                     print("before", self.result_table.loc[key, 'time'].values)
@@ -143,13 +145,13 @@ class TaskRunner:
                 sorted_table = self.result_table.sort_values(by="time")\
                     .reset_index(drop=True)
                 self.job_total_num = 0
-                self.result_table = pd.DataFrame()
+                self.result_table = pd.DataFrame(columns = sorted_table.columns)
+                self.result_table = pd.concat([self.result_table, sorted_table[:int(len(sorted_table) / 4.0)]])
                 for i in range(int(len(sorted_table) / 4.0)):
                     job_id = sorted_table['job_id'][i]
                     build = self.candidate_jobs[job_id]["build_param"]
                     job = self.candidate_jobs[job_id]["job_param"]
                     is_bench = self.candidate_jobs[job_id]["is_bench"]
-                    self.result_table[i] = self.sorted_table[i]
                     self.pending_jobs_bak.append([build, job, is_bench])
                     self.job_total_num += 1
                 print(self.pending_jobs_bak)
@@ -159,7 +161,7 @@ class TaskRunner:
                 print(self.pending_jobs)
                 print(self.pending_jobs_bak)
             else:
-                self.result_table['avg_time'] = self.result_table['time'] / 3.0
+                self.result_table['avg_time'] = self.result_table['time'] / 4.0
                 self.result_table.to_csv("result_candidate.csv")
                 self.timer_.cancel()
                 return
