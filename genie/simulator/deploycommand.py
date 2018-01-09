@@ -18,7 +18,7 @@ class DeployCommand():
         self.build_generator = BuildGenerator()
         self.job_generator = JobGenerator(self.job_name)
 
-    def build(self, env, bench, use_tmp):
+    def build(self, env, bench, params, use_tmp):
         self.build_generator.gen(params, use_tmp)
         commands = []
         tmp_str = ".tmp" if use_tmp else ""
@@ -128,8 +128,8 @@ class DeployCommand():
             }]
         self.shell.run_cmds(commands)
 
-    def run(self, env, cnt):
-        self.job_generator.gen(params, cnt)
+    def run(self, env, params, cnt, use_tmp):
+        self.job_generator.gen(params, cnt, use_tmp)
         if env == "cluster":
             res = self.shell.execute(
                 "qsub",

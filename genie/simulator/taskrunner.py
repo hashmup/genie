@@ -57,6 +57,8 @@ class TaskRunner:
             self.lock.acquire()
             build_param, job_param, is_bench = self.pending_jobs.pop(0)
             job_id = self.deploy(self.current_build_param != build_param,
+                                 build_param,
+                                 job_param,
                                  is_bench)
             if self.first:
                 # record params for future use
@@ -196,10 +198,13 @@ class TaskRunner:
                 self.current_job_num += 1
                 self.lock.release()
 
-    def deploy(self, shouldBuild, is_bench):
+    def deploy(self, shouldBuild, build_params, job_params, is_bench):
         if shouldBuild:
             self.compiler.gen("neuron_kplus/mod/hh_k.mod")
-            self.deployCommand.build(self.environment, is_bench, self.use_tmp)
+            self.deployCommand.build(self.environment, is_bench, build_params, self.use_tmp)
             self.use_tmp = not self.use_tmp
         self.job_cnt += 1
-        return self.deployCommand.run(self.environment, self.job_cnt)
+        return self.deployCommand.run(self.environment,
+                                      job_params,
+                                      self.job_cnt,
+                                      self.use_tmp)
