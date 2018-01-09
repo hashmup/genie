@@ -26,10 +26,10 @@
     "job" : {
         "job_cluster": {
             "nodes":"1",
-            "ppn":"1,28,1",
+            "ppn":"2,28,2",
             "modules": [
             ],
-            "omp_num_threads": "1,16,1",
+            "omp_num_threads": "2,16,2",
             "nrniv": "../specials/x86_64/special -mpi",
             "hoc_name": "../hoc/bench_main.hoc",
             "stop_time": 250,

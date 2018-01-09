@@ -1,15 +1,12 @@
 from collections import defaultdict
-from simulator.buildgenerator import BuildGenerator
 
 
 class BuildProcessor():
     def __init__(self, param_dict):
         self.build_param_dict = param_dict["build"]
         self.build_config_param_dict = param_dict["build_config"]
-        self.build_generator = BuildGenerator()
         self.make_table()
         self.done = False
-        self.use_tmp = False  # We use both original and tmp
 
     def make_table_(self, dict_):
         for k in dict_:
@@ -80,8 +77,6 @@ class BuildProcessor():
 
     def process(self):
         params = self.cur_params()
-        self.build_generator.gen(params, self.use_tmp)
-        self.use_tmp = not self.use_tmp
         # proceed by 1
         keys = list(self.index_table.keys())
         for i in range(len(keys)):

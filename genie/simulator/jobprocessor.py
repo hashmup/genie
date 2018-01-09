@@ -1,5 +1,4 @@
 from collections import defaultdict
-from simulator.jobgenerator import JobGenerator
 from utils.env import Environment
 
 
@@ -8,10 +7,8 @@ class JobProcessor():
         self.env = Environment()
         self.job_name = 'job_{0}'.format(self.env.get_env())
         self.jobparam_dict = param_dict[self.job_name]
-        self.job_generator = JobGenerator(self.job_name)
         self.build_table()
         self.done = False
-        self.curry = False
 
     def build_table(self):
         self.job_table = defaultdict(dict)
@@ -57,7 +54,6 @@ class JobProcessor():
 
     def process(self):
         params = self.cur_params()
-        self.job_generator.gen(params)
 
         # proceed by 1
         # if self.curry:

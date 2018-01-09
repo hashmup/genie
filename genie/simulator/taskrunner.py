@@ -41,6 +41,8 @@ class TaskRunner:
         self.lock = threading.Lock()
         self.relation_table = defaultdict(dict)
         self.deployCommand = DeployCommand(neuron_path)
+        self.job_cnt = 0
+        self.use_tmp = False  # We use both original and tmp
         self.complete = False
         self.first = True
         self.cnt = 0
@@ -197,5 +199,7 @@ class TaskRunner:
     def deploy(self, shouldBuild, is_bench):
         if shouldBuild:
             self.compiler.gen("neuron_kplus/mod/hh_k.mod")
-            self.deployCommand.build(self.environment, is_bench)
-        return self.deployCommand.run(self.environment)
+            self.deployCommand.build(self.environment, is_bench, self.use_tmp)
+            self.use_tmp = not self.use_tmp
+        self.job_cnt += 1
+        return self.deployCommand.run(self.environment, self.job_cnt)
