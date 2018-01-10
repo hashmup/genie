@@ -6,7 +6,7 @@ from simulator.jobgenerator import JobGenerator
 
 
 id_cluster_exp = re.compile("(?P<id>[0-9]+).\w+.\w+")
-id_k_exp = re.compile("(?P<id>[0-9]+).\w+.\w+")
+id_k_exp = re.compile("\[INFO\]\s+PJM\s+\d+\s+\w+\s+\w+\s(?P<id>\d+)\s+\w+.")
 
 
 class DeployCommand():
