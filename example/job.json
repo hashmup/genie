@@ -28,7 +28,7 @@
               "--without-nmodl",
               "--without-nrnoc-x11",
               "--host=sparc64-unknown-linux-gnu",
-              "--build=x86_64-unknown-linux-gnu"
+              "--build=x86_64-unknown-linux-gnu",
               "--with-paranrn",
               "--with-mpi",
               "--with-multisend",

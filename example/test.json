@@ -4,7 +4,7 @@
             "neuron_path": "../nrn-7.2",
             "specials_path": "../specials"
         },
-        "build_config": {
+        "build_config_cluster": {
             "options": [
               "--without-iv",
               "--without-x",
@@ -20,6 +20,30 @@
               "use_pthread":"no",
               "CFLAGS":"\"-O3 -fopenmp -DKPLUS -DKPLUS_GATHER_SCATTER -DKPLUS_SPAWN -DCLUSTER_USE_OMP\"",
               "CXXFLAGS":"\"-O3 -fopenmp -DKPLUS -DKPLUS_GATHER_SCATTER -DKPLUS_SPAWN -DCLUSTER_USE_OMP\""
+            }
+        },
+        "build_config_k": {
+            "options": [
+              "--without-x",
+              "--without-nmodl",
+              "--without-nrnoc-x11",
+              "--host=sparc64-unknown-linux-gnu",
+              "--build=x86_64-unknown-linux-gnu",
+              "--with-paranrn",
+              "--with-mpi",
+              "--with-multisend",
+              "--enable-shared=no",
+              "--enable-static=yes",
+            ],
+            "compile_options": {
+              "linux_nrnmech":"no",
+              "use_pthread":"no",
+              "CFLAGS":"\"-O3 -fopenmp -DKPLUS -DKPLUS_GATHER_SCATTER -DKPLUS_SPAWN -DCLUSTER_USE_OMP\"",
+              "CXXFLAGS":"\"-O3 -fopenmp -DKPLUS -DKPLUS_GATHER_SCATTER -DKPLUS_SPAWN -DCLUSTER_USE_OMP\"",
+              "CC":"mpifccpx",
+              "CXX":"mpiFCCpx",
+              "MPICC":"mpifccpx",
+              "MPICXX":"mpiFCCpx"
             }
         }
     },
@@ -37,11 +61,11 @@
             "prof": ""
         },
         "job_k": {
-            "nodes":"1",
+            "nodes":"2",
             "ppn":"8",
             "modules": [
             ],
-            "omp_num_threads": "8,16,4",
+            "omp_num_threads": "16",
             "nrniv": "../specials/x86_64/special -mpi",
             "hoc_name": "../hoc/bench_main.hoc",
             "stop_time": 1000,
