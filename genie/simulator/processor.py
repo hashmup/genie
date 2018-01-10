@@ -72,6 +72,18 @@ class Processor():
             ["-p"],
             neuron_path
         )
+        self.shell.execute(
+            "mkdir",
+            ["exec"],
+            ["-p"],
+            neuron_path
+        )
+        self.shell.execute(
+            "mkdir",
+            ["exec.tmp"],
+            ["-p"],
+            neuron_path
+        )
         # setup copy of neuron dir
         # we need to do this so that we don't have to wait
         # while we are building, o/w we cannot deploy a job

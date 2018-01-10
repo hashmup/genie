@@ -1,10 +1,13 @@
 from collections import defaultdict
+from utils.env import Environment
 
 
 class BuildProcessor():
     def __init__(self, param_dict):
+        self.env = Environment()
+        self.build_config_name = 'build_config_{0}'.format(self.env.get_env())
         self.build_param_dict = param_dict["build"]
-        self.build_config_param_dict = param_dict["build_config"]
+        self.build_config_param_dict = param_dict[self.build_config_name]
         self.make_table()
         self.done = False
 

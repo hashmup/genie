@@ -55,82 +55,52 @@ class DeployCommand():
             }]
         if env == "k":
             commands = [{
+                "command": "../config/do_config_k1.sh",
+                "args": [],
+                "options":[],
+                "work_dir": "{0}/nrn-7.2{1}".format(self.neuron_path, tmp_str)
+            },
+                {
                 "command": "make",
-                "args": ["clean"],
+                "args": [],
                 "options": [],
-                "work_dir": "neuron_kplus/nrn-7.3"
+                "work_dir": "{0}/nrn-7.2{1}".format(self.neuron_path, tmp_str)
+            },
+                {
+                "command": "make",
+                "args": ["install"],
+                "options": [],
+                "work_dir": "{0}/nrn-7.2{1}".format(self.neuron_path, tmp_str)
             },
                 {
                 "command": "../../genie/simulator/tmp/build_config.sh",
                 "args": [],
-                "options":[],
-                "work_dir": "neuron_kplus/nrn-7.3"
-            },
-                {
-                "command": "bash",
-                "args": ["../../genie/simulator/tmp/build.sh"],
                 "options": [],
-                "work_dir": "neuron_kplus/nrn-7.3"
-            },
-                {
-                "command": "make",
-                "args": ["clean"],
-                "options": [],
-                "work_dir": "neuron_kplus/nrn-7.3"
+                "work_dir": "{0}/nrn-7.2{1}".format(self.neuron_path, tmp_str)
             },
                 {
                 "command": "make",
                 "args": [],
                 "options": [],
-                "work_dir": "neuron_kplus/nrn-7.3"
+                "work_dir": "{0}/nrn-7.2{1}".format(self.neuron_path, tmp_str)
             },
                 {
                 "command": "make",
                 "args": ["install"],
                 "options": [],
-                "work_dir": "neuron_kplus/nrn-7.3"
-            },
-                {
-                "command": "../../genie/simulator/tmp/build_config_tune.sh",
-                "args": [],
-                "options": [],
-                "work_dir": "neuron_kplus/nrn-7.3"
-            },
-                {
-                "command": "bash",
-                "args": ["../../genie/simulator/tmp/build.sh"],
-                "options": [],
-                "work_dir": "neuron_kplus/nrn-7.3"
-            },
-                {
-                "command": "make",
-                "args": ["clean"],
-                "options": [],
-                "work_dir": "neuron_kplus/nrn-7.3"
-            },
-                {
-                "command": "make",
-                "args": [],
-                "options": [],
-                "work_dir": "neuron_kplus/nrn-7.3"
-            },
-                {
-                "command": "make",
-                "args": ["install"],
-                "options": [],
-                "work_dir": "neuron_kplus/nrn-7.3"
+                "work_dir": "{0}/nrn-7.2{1}".format(self.neuron_path, tmp_str)
             },
                 {
                 "command": "cp",
                 "args": ["./x86_64/bin/*", "./sparc64/bin/"],
                 "options": [],
-                "work_dir": "neuron_kplus/exec"
+                "work_dir": "{0}/exec{1}".format(self.neuron_path, tmp_str)
             },
                 {
                 "command": "./make_special_sparc64.sh",
                 "args": [],
                 "options": [],
-                "work_dir": "neuron_kplus/specials"
+                "work_dir": "{0}/specials{1}".format(self.neuron_path, tmp_str)
             }]
         self.shell.run_cmds(commands)
 
