@@ -162,11 +162,11 @@ class Variable():
         cnt = 0
         params = children_of_type('Global', root)[0].globals
         code = "#ifdef RESTRUCT_TABLE\n"\
-               "#define TABLE_SIZE\n"\
-               "FLOAT {0}_table[TABLE_SIZE][{1}];\n"\
+               "#define TABLE_SIZE 201\n"\
+               "FLOAT {0}_table[{1}][TABLE_SIZE];\n"\
                .format(self.filename, len(params))
         for param in params:
-            code += "#define TABLE_{0}(x) {1}_table[(x)][{2}]\n"\
+            code += "#define TABLE_{0}(x) {1}_table[{2}][(x)]\n"\
                     .format(param.name.upper(), self.filename, cnt)
             cnt += 1
         code += "#else\n"

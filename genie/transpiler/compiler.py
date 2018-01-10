@@ -28,15 +28,15 @@ class Compiler():
         self.user_func = UserFunc()
         self.variable = Variable()
 
-    def parse(self, path):
-        with open(path, "r") as f:
+    def parse(self):
+        with open(self.path, "r") as f:
             data = f.read()
         self.lems_comp_type_generator.compile_to_string(data)
         return self.lems_comp_type_generator.root
 
-    def compile(self, path):
-        root = self.parse(path)
-        filename = self.get_filename(path)
+    def compile(self):
+        root = self.parse()
+        filename = self.get_filename()
         return self.jinja_template.render(
             global_variable=self.variable.compile(filename, root),
             reg=self.reg.compile(filename, root),
@@ -46,16 +46,23 @@ class Compiler():
         )
 
     def gen(self, path):
+        self.path = path
         self.setup_dir()
-        write_file(self.get_output_filepath(path), self.compile(path))
+        write_file(
+            self.get_output_filepath(),
+            self.compile())
 
-    def get_filename(self, path):
-        base = os.path.basename(path)
+    def get_symbols(self, path):
+        self.path = path
+        return self.parse()
+
+    def get_filename(self):
+        base = os.path.basename(self.path)
         return os.path.splitext(base)[0]
 
-    def get_output_filepath(self, path):
+    def get_output_filepath(self):
         return os.path.join(
-            join(ROOT, 'tmp'), "{0}.c".format(self.get_filename(path))
+            join(ROOT, 'tmp'), "{0}.c".format(self.get_filename())
         )
 
     def setup_dir(self):

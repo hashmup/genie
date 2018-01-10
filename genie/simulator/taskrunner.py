@@ -86,7 +86,7 @@ class TaskRunner:
                 for key in merge_params.keys():
                     if isinstance(merge_params[key], defaultdict) or\
                             isinstance(merge_params[key], list) or\
-                                isinstance(merge_params[key], dict):
+                            isinstance(merge_params[key], dict):
                         if key not in self.result_table:
                             self.result_table.loc[-1, key] = 0
                         self.result_table[key] =\
@@ -115,15 +115,15 @@ class TaskRunner:
     def watch_job(self):
         print("{0}/{1} {2}".format(self.job_total_num - len(self.pending_jobs),
                                    self.job_total_num, str(datetime.now())))
-        print("current: {0}\nremaining: {1}\njob num: {2}".format(len(self.running_jobs), len(self.pending_jobs), self.current_job_num))
         self.lock.acquire()
         for i in range(len(self.running_jobs)):
             if not self.is_job_still_running(self.running_jobs[i]):
                 # print("complete {0}".format(self.running_jobs[i]))
                 self.current_job_num -= 1
+                job_cnt = self.relation_table_job_cnt[self.running_jobs[i]]
                 time = self.summarizer.summary(self.environment,
                                                self.running_jobs[i],
-                                               self.relation_table_job_cnt[self.running_jobs[i]])
+                                               job_cnt)
                 if self.first:
                     key = self.result_table['job_id'] == self.running_jobs[i]
                 else:
@@ -206,7 +206,10 @@ class TaskRunner:
         if shouldBuild:
             self.use_tmp = not self.use_tmp
             self.compiler.gen("neuron_kplus/mod/hh_k.mod")
-            self.deployCommand.build(self.environment, is_bench, build_params, self.use_tmp)
+            self.deployCommand.build(self.environment,
+                                     is_bench,
+                                     build_params,
+                                     self.use_tmp)
         self.job_cnt += 1
         return self.deployCommand.run(self.environment,
                                       job_params,
