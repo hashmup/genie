@@ -12,11 +12,12 @@ id_k_exp = re.compile("(?P<id>[0-9]+).\w+.\w+")
 class DeployCommand():
     def __init__(self, neuron_path):
         self.env = Environment()
-        self.job_name = 'job_{0}'.format(self.env.get_env())
         self.shell = Shell()
         self.neuron_path = neuron_path
-        self.build_generator = BuildGenerator()
-        self.job_generator = JobGenerator(self.job_name)
+        job_name = 'job_{0}'.format(self.env.get_env())
+        build_config_name = 'build_config_{0}'.format(self.env.get_env())
+        self.build_generator = BuildGenerator(build_config_name)
+        self.job_generator = JobGenerator(job_name)
 
     def build(self, env, bench, params, use_tmp):
         self.build_generator.gen(params, use_tmp, self.env.get_env())
