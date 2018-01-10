@@ -38,8 +38,8 @@
             "compile_options": {
               "linux_nrnmech":"no",
               "use_pthread":"no",
-              "CFLAGS":"\"-O3 -fopenmp -DKPLUS -DKPLUS_GATHER_SCATTER -DKPLUS_SPAWN -DCLUSTER_USE_OMP\"",
-              "CXXFLAGS":"\"-O3 -fopenmp -DKPLUS -DKPLUS_GATHER_SCATTER -DKPLUS_SPAWN -DCLUSTER_USE_OMP\"",
+              "CFLAGS":"\"-Kfast -DKPLUS -DKPLUS_GATHER_SCATTER -DKPLUS_SPAWN -DCLUSTER_USE_OMP\"",
+              "CXXFLAGS":"\"-Kfast -DKPLUS -DKPLUS_GATHER_SCATTER -DKPLUS_SPAWN -DCLUSTER_USE_OMP\"",
               "CC":"mpifccpx",
               "CXX":"mpiFCCpx",
               "MPICC":"mpifccpx",
