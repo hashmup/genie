@@ -10,7 +10,7 @@
 #PJM --mpi "use-rankdir"
 
 # CHANGE TO YOUR OWN DIR
-#PJM --stgin-basedir /home/hp160269/k03796/neuron_kplus
+#PJM --stgin-basedir /home/hp160269/k03796/genie/neuron_kplus
 
 #--PJM --stgout "rank=* %r:./prof/* /data/hp160269/k03796/result/prof/job_k/%j/"
 

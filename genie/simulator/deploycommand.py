@@ -119,7 +119,7 @@ class DeployCommand():
             return m.group("id")
         elif env == "k":
             res = self.shell.execute(
-                "psub",
+                "pjsub",
                 ["../../genie/simulator/tmp/job{0}.sh".format(cnt)],
                 [],
                 "{0}/hoc".format(self.neuron_path)
