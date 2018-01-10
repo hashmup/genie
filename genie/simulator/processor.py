@@ -78,13 +78,13 @@ class Processor():
         # we need to copy neuron_kplus/nrn-7.x and neuron_kplus/specials
         nrn_path = "{0}/nrn-7.2".format(neuron_path)
         specials_path = "{0}/specials".format(neuron_path)
-        print(self.shell.execute(
+        self.shell.execute(
             "cp",
             [nrn_path, "{0}.tmp".format(nrn_path)],
             ["-r"]
-        ))
-        print(self.shell.execute(
+        )
+        self.shell.execute(
             "cp",
             [specials_path, "{0}.tmp".format(specials_path)],
             ["-r"]
-        ))
+        )

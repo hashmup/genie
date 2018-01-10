@@ -21,8 +21,7 @@ class Summarizer:
     def __init__(self):
         self.shell = Shell()
 
-    def summary(self, job_type, job_id, job_cnt):
-        #time = self.obtain_time("job_{0}{1}.sh.o{2}".format(job_type, job_cnt, job_id))
+    def summary(self, job_id, job_cnt):
         time = self.obtain_time("job{0}.sh.o{1}".format(job_cnt, job_id))
 
         # self.clean_up(job_type, job_id)

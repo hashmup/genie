@@ -11,8 +11,10 @@ import pandas as pd
 import numpy as np
 import threading
 
-job_exp = re.compile(
+job_cluster_exp = re.compile(
     "(?P<id>\d+).\w+\s+\w+.\w+\s+\w+\s+\d+:\d+:\d+\s+(?P<state>\w+)\s+\w+\s+")
+job_k_exp = re.compile(
+    "(?P<id>\d+)\s+\w+.\w+\s+\w+\s+(?P<state>\w+)\s+[\w\d\[\]\/\:\-]+")
 
 
 class TaskRunner:
@@ -99,18 +101,33 @@ class TaskRunner:
             self.lock.release()
 
     def is_job_still_running(self, job_id):
-        res = self.shell.execute("qstat", [], [], "")[0]
-        if type(res) is bytes:
-            res = res.decode('utf-8')
-        job_lines = res.split('\n')
-        if len(job_lines) > 2:
-            for line in job_lines[2:]:
-                m = job_exp.match(line)
-                if m is not None:
-                    state = m.group("state")
-                    if job_id == m.group("id") and state == "C":
-                        return False
-        return True
+        if self.env.get_env() == "cluster":
+            res = self.shell.execute("qstat", [], [], "")[0]
+            if type(res) is bytes:
+                res = res.decode('utf-8')
+            job_lines = res.split('\n')
+            if len(job_lines) > 2:
+                for line in job_lines[2:]:
+                    m = job_cluster_exp.match(line)
+                    if m is not None:
+                        state = m.group("state")
+                        if job_id == m.group("id") and state == "C":
+                            return False
+            return True
+        elif self.env.get_env() == "k":
+            res = self.shell.execute("pjstat", [], [], "")[0]
+            if type(res) is bytes:
+                res = res.decode('utf-8')
+            job_lines = res.split('\n')
+            if len(job_lines) > 2:
+                for line in job_lines[2:]:
+                    m = job_cluster_exp.match(line)
+                    if m is not None:
+                        state = m.group("state")
+                        if job_id == m.group("id") and\
+                                (state == "RNO" or state == "STO"):
+                            return False
+            return True
 
     def watch_job(self):
         print("{0}/{1} {2}".format(self.job_total_num - len(self.pending_jobs),
@@ -121,9 +138,7 @@ class TaskRunner:
                 # print("complete {0}".format(self.running_jobs[i]))
                 self.current_job_num -= 1
                 job_cnt = self.relation_table_job_cnt[self.running_jobs[i]]
-                time = self.summarizer.summary(self.environment,
-                                               self.running_jobs[i],
-                                               job_cnt)
+                time = self.summarizer.summary(self.running_jobs[i], job_cnt)
                 if self.first:
                     key = self.result_table['job_id'] == self.running_jobs[i]
                 else:

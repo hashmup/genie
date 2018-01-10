@@ -33,6 +33,8 @@ clean:  clean-dir clean-pyc clean-log
 run: clean
 	python main.py example/job.json
 
+test: clean
+	python main.py example/test.json
 compile:
 	python genie/transpiler_test.py
 

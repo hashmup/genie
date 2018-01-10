@@ -55,6 +55,12 @@ class DeployCommand():
             }]
         if env == "k":
             commands = [{
+                "command": "make",
+                "args": ["clean"],
+                "options": [],
+                "work_dir": "neuron_kplus/nrn-7.3"
+            },
+                {
                 "command": "../../genie/simulator/tmp/build_config.sh",
                 "args": [],
                 "options":[],
@@ -144,7 +150,7 @@ class DeployCommand():
         elif env == "k":
             res = self.shell.execute(
                 "psub",
-                ["../../genie/simulator/tmp/job_k.sh"],
+                ["../../genie/simulator/tmp/job{0}.sh".format(cnt)],
                 [],
                 "{0}/hoc".format(self.neuron_path)
             )[0]

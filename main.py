@@ -1,7 +1,11 @@
 #!/usr/bin/env python
 
 from argparse import ArgumentParser
+from os.path import join, dirname, abspath
 from genie.genie import Genie
+
+
+ROOT = abspath(dirname(__file__))
 
 
 def parse_args():
@@ -13,4 +17,5 @@ def parse_args():
 
 if __name__ == '__main__':
     args = parse_args()
-    Genie("/home/inoue/genie/neuron_kplus", args=args).run()
+    neuron_path = join(ROOT, 'neuron_kplus')
+    Genie(neuron_path, args=args).run()
