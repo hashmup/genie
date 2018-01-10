@@ -81,12 +81,14 @@ class DeployCommand():
                 {
                 "command": "export",
                 "args": ["LANG=C"],
-                "options": []
+                "options": [],
+                "work_dir": "{0}/nrn-7.2{1}".format(self.neuron_path, tmp_str)
             },
                 {
                 "command": "export",
                 "args": ["LC_ALL=C"],
-                "options": []
+                "options": [],
+                "work_dir": "{0}/nrn-7.2{1}".format(self.neuron_path, tmp_str)
             },
                 {
                 "command": "../../genie/simulator/tmp/build_config.sh",
