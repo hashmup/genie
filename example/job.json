@@ -33,7 +33,7 @@
               "--with-mpi",
               "--with-multisend",
               "--enable-shared=no",
-              "--enable-static=yes",
+              "--enable-static=yes"
             ],
             "compile_options": {
               "linux_nrnmech":"no",
