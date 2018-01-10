@@ -40,9 +40,10 @@ class TaskRunner:
         self.result_table = pd.DataFrame()
         self.lock = threading.Lock()
         self.relation_table = defaultdict(dict)
+        self.relation_table_job_cnt = defaultdict(dict)
         self.deployCommand = DeployCommand(neuron_path)
         self.job_cnt = 0
-        self.use_tmp = False  # We use both original and tmp
+        self.use_tmp = True  # We use both original and tmp
         self.complete = False
         self.first = True
         self.cnt = 0
@@ -60,6 +61,7 @@ class TaskRunner:
                                  build_param,
                                  job_param,
                                  is_bench)
+            self.relation_table_job_cnt[job_id] = self.job_cnt
             if self.first:
                 # record params for future use
                 self.candidate_jobs[job_id]["build_param"] = build_param
@@ -83,7 +85,8 @@ class TaskRunner:
                          **{"job_id": job_id, "bench": is_bench, "time": 0})
                 for key in merge_params.keys():
                     if isinstance(merge_params[key], defaultdict) or\
-                            isinstance(merge_params[key], list):
+                            isinstance(merge_params[key], list) or\
+                                isinstance(merge_params[key], dict):
                         if key not in self.result_table:
                             self.result_table.loc[-1, key] = 0
                         self.result_table[key] =\
@@ -112,19 +115,20 @@ class TaskRunner:
     def watch_job(self):
         print("{0}/{1} {2}".format(self.job_total_num - len(self.pending_jobs),
                                    self.job_total_num, str(datetime.now())))
+        print("current: {0}\nremaining: {1}\njob num: {2}".format(len(self.running_jobs), len(self.pending_jobs), self.current_job_num))
         self.lock.acquire()
         for i in range(len(self.running_jobs)):
             if not self.is_job_still_running(self.running_jobs[i]):
                 # print("complete {0}".format(self.running_jobs[i]))
                 self.current_job_num -= 1
                 time = self.summarizer.summary(self.environment,
-                                               self.running_jobs[i])
+                                               self.running_jobs[i],
+                                               self.relation_table_job_cnt[self.running_jobs[i]])
                 if self.first:
                     key = self.result_table['job_id'] == self.running_jobs[i]
                 else:
                     key = self.result_table['job_id'] ==\
                           self.relation_table[self.running_jobs[i]]
-                    print(key)
                 if self.first:
                     self.result_table.loc[key, 'time'] = time
                 else:
@@ -171,7 +175,7 @@ class TaskRunner:
             self.pending_jobs = self.pending_jobs_bak[:]
             self.run()
             return
-        self.timer_ = threading.Timer(20.0, self.watch_job)
+        self.timer_ = threading.Timer(10.0, self.watch_job)
         self.timer_.start()
 
     def run(self):
@@ -182,7 +186,7 @@ class TaskRunner:
             num = self.current_job_num
             self.lock.release()
             if num > self.MAX_NUM_JOBS:
-                time.sleep(20)
+                time.sleep(10)
             while True:
                 self.lock.acquire()
                 num = self.current_job_num
@@ -200,9 +204,9 @@ class TaskRunner:
 
     def deploy(self, shouldBuild, build_params, job_params, is_bench):
         if shouldBuild:
+            self.use_tmp = not self.use_tmp
             self.compiler.gen("neuron_kplus/mod/hh_k.mod")
             self.deployCommand.build(self.environment, is_bench, build_params, self.use_tmp)
-            self.use_tmp = not self.use_tmp
         self.job_cnt += 1
         return self.deployCommand.run(self.environment,
                                       job_params,

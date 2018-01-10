@@ -133,7 +133,7 @@ class DeployCommand():
         if env == "cluster":
             res = self.shell.execute(
                 "qsub",
-                ["../../genie/simulator/tmp/job_cluster{0}.sh".format(cnt)],
+                ["../../genie/simulator/tmp/job{0}.sh".format(cnt)],
                 [],
                 "{0}/hoc".format(self.neuron_path)
             )[0]

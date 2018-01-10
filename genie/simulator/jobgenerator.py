@@ -12,7 +12,8 @@ class JobGenerator(Generator):
         if use_tmp:
             nrniv_path = nrniv_path.replace("specials", "specials.tmp")
         output = self.contents[self.job_name]['output_file']
-        output = output.replace(".sh", "{0}.sh".format(cnt))
+        output = output.replace("job_cluster.sh", "job{0}.sh".format(cnt))
+        print(output)
         tmp = self.contents[self.job_name]['template'].render(
             nodes=params['nodes'],
             ppn=params['ppn'],

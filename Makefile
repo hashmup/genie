@@ -14,6 +14,7 @@ clean-pyc:
 
 clean-dir:
 	rm -rf genie/tmp
+	rm -rf genie/simulator/tmp
 	rm -rf neuron_kplus/nrn-7.2.tmp
 	rm -rf neuron_kplus/specials.tmp
 

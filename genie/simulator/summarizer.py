@@ -21,9 +21,12 @@ class Summarizer:
     def __init__(self):
         self.shell = Shell()
 
-    def summary(self, job_type, job_id):
-        time = self.obtain_time("job_{0}.sh.o{1}".format(job_type, job_id))
-        self.clean_up(job_type, job_id)
+    def summary(self, job_type, job_id, job_cnt):
+        #time = self.obtain_time("job_{0}{1}.sh.o{2}".format(job_type, job_cnt, job_id))
+        time = self.obtain_time("job{0}.sh.o{1}".format(job_cnt, job_id))
+
+        # self.clean_up(job_type, job_id)
+        self.clean_up(job_cnt, job_id)
         return time
 
     def obtain_time(self, filename):
@@ -38,18 +41,18 @@ class Summarizer:
                 print(time)
                 return time
 
-    def clean_up(self, job_type, job_id):
+    def clean_up(self, job_cnt, job_id):
         self.shell.execute(
             "cp",
-            ["job_{0}.sh.o{1} ../../tmp/".format(job_type, job_id)],
+            ["job{0}.sh.o{1} ../../tmp/".format(job_cnt, job_id)],
             [],
             dir_path
         )
         self.shell.execute(
             "rm",
             [
-                "job_{0}.sh.o{1}".format(job_type, job_id),
-                "job_{0}.sh.e{1}".format(job_type, job_id),
+                "job{0}.sh.o{1}".format(job_cnt, job_id),
+                "job{0}.sh.e{1}".format(job_cnt, job_id),
             ],
             ["-f"],
             dir_path
