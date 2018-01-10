@@ -15,8 +15,7 @@ class DeployCommand():
         self.shell = Shell()
         self.neuron_path = neuron_path
         job_name = 'job_{0}'.format(self.env.get_env())
-        build_config_name = 'build_config_{0}'.format(self.env.get_env())
-        self.build_generator = BuildGenerator(build_config_name)
+        self.build_generator = BuildGenerator()
         self.job_generator = JobGenerator(job_name)
 
     def build(self, env, bench, params, use_tmp):

@@ -3,11 +3,8 @@ from utils.fileutil import *
 
 
 class BuildGenerator(Generator):
-    def __init__(self, build_config_name):
-        self.build_config_name = build_config_name
-        Generator.__init__(self,
-                           [['build', 'sh'],
-                            [build_config_name, 'sh']])
+    def __init__(self):
+        Generator.__init__(self, [['build', 'sh'], ['build_config', 'sh']])
 
     def gen(self, build_params, use_tmp, env):
         neuron_path = build_params["neuron_path"]
@@ -26,11 +23,9 @@ class BuildGenerator(Generator):
             env=env
         )
         write_file(self.contents["build"]['output_file'], tmp)
-        tmp = self.contents[self.build_config_name]['template']\
+        tmp = self.contents['build_config']['template']\
             .render(
             options=build_params["options"],
             compile_options=build_params["compile_options"]
         )
-        write_file(
-            self.contents['build_config_{0}'.format(env_name)]['output_file'],
-            tmp)
+        write_file(self.contents['build_config']['output_file'], tmp)
