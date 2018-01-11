@@ -32,6 +32,7 @@ class TaskRunner:
         self.pending_jobs = []
         self.pending_jobs_bak = []
         self.running_jobs = []
+        self.check_running_jobs = []
         self.candidate_jobs = defaultdict(dict)
         self.current_build_param = None
         self.shell = Shell()
@@ -121,13 +122,12 @@ class TaskRunner:
             job_lines = res.split('\n')
             if len(job_lines) > 2:
                 for line in job_lines[2:]:
-                    m = job_cluster_exp.match(line)
+                    m = job_k_exp.match(line)
                     if m is not None:
                         state = m.group("state")
-                        if job_id == m.group("id") and\
-                                (state == "RNO" or state == "STO"):
-                            return False
-            return True
+                        if job_id == m.group("id"):
+                            return True
+            return False
 
     def watch_job(self):
         print("{0}/{1} {2}".format(self.job_total_num - len(self.pending_jobs),
