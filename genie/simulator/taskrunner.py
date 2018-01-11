@@ -1,5 +1,6 @@
 import re
 import time
+import math
 from utils.shell import Shell
 from simulator.summarizer import Summarizer
 from simulator.verifier import Verifier
@@ -170,8 +171,8 @@ class TaskRunner:
                     pd.DataFrame(columns=sorted_table.columns)
                 self.result_table = pd.concat(
                     [self.result_table,
-                     sorted_table[:int(len(sorted_table) / 4.0)]])
-                for i in range(int(len(sorted_table) / 4.0)):
+                     sorted_table[:math.ceil(len(sorted_table) / 4.0)]])
+                for i in range(math.ceil(len(sorted_table) / 4.0)):
                     job_id = sorted_table['job_id'][i]
                     build = self.candidate_jobs[job_id]["build_param"]
                     job = self.candidate_jobs[job_id]["job_param"]
