@@ -14,7 +14,7 @@ import threading
 job_cluster_exp = re.compile(
     "(?P<id>\d+).\w+\s+\w+.\w+\s+\w+\s+\d+:\d+:\d+\s+(?P<state>\w+)\s+\w+\s+")
 job_k_exp = re.compile(
-    "(?P<id>\d+)\s+\w+.\w+\s+\w+\s+(?P<state>\w+)\s+[\w\d\[\]\/\:\-]+")
+    "(?P<id>\d+)\s+\w+.\w+\s+\w+\s+(?P<state>\w+)\s+[\s\w\d\[\]\/\:\-]+")
 
 
 class TaskRunner:
@@ -32,7 +32,6 @@ class TaskRunner:
         self.pending_jobs = []
         self.pending_jobs_bak = []
         self.running_jobs = []
-        self.check_running_jobs = []
         self.candidate_jobs = defaultdict(dict)
         self.current_build_param = None
         self.shell = Shell()

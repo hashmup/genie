@@ -66,8 +66,8 @@
             "modules": [
             ],
             "omp_num_threads": "16",
-            "nrniv": "../specials/x86_64/special -mpi",
-            "hoc_name": "../hoc/bench_main.hoc",
+            "nrniv": "./special -mpi",
+            "hoc_name": "./bench_main.hoc",
             "stop_time": 1000,
             "nthread": 16,
             "prof": ""
