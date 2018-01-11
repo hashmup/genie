@@ -35,6 +35,7 @@ class TaskRunner:
         self.running_jobs = []
         self.candidate_jobs = defaultdict(dict)
         self.current_build_param = None
+        self.current_bench = True
         self.shell = Shell()
         self.summarizer = Summarizer()
         self.compiler = Compiler()
@@ -60,7 +61,9 @@ class TaskRunner:
         if len(self.pending_jobs) > 0:
             self.lock.acquire()
             build_param, job_param, is_bench = self.pending_jobs.pop(0)
-            job_id = self.deploy(self.current_build_param != build_param,
+            shouldBuild = self.current_build_param != build_param or\
+                self.current_bench != is_bench
+            job_id = self.deploy(shouldBuild,
                                  build_param,
                                  job_param,
                                  is_bench)
@@ -80,6 +83,7 @@ class TaskRunner:
                             and bench == is_bench:
                                 self.relation_table[job_id] = key
             self.current_build_param = build_param
+            self.current_bench = is_bench
             self.running_jobs.append(job_id)
             if self.first:
                 merge_params =\
