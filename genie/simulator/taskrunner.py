@@ -101,7 +101,7 @@ class TaskRunner:
             self.lock.release()
 
     def is_job_still_running(self, job_id):
-        if self.env.get_env() == "cluster":
+        if self.environment == "cluster":
             res = self.shell.execute("qstat", [], [], "")[0]
             if type(res) is bytes:
                 res = res.decode('utf-8')
@@ -114,7 +114,7 @@ class TaskRunner:
                         if job_id == m.group("id") and state == "C":
                             return False
             return True
-        elif self.env.get_env() == "k":
+        elif self.environment == "k":
             res = self.shell.execute("pjstat", [], [], "")[0]
             if type(res) is bytes:
                 res = res.decode('utf-8')
