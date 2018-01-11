@@ -135,9 +135,10 @@ class DeployCommand():
                 ["../../genie/simulator/tmp/job{0}.sh".format(cnt)],
                 [],
                 "{0}/hoc".format(self.neuron_path)
-            )[0]
-            if type(res) is bytes:
-                res = res.decode('utf-8')
+            )
+            if type(res[0]) is bytes:
+                res1 = res[0].decode('utf-8')
+            print(res1)
             print(res)
-            m = id_k_exp.match(res)
+            m = id_k_exp.match(res1)
             return m.group("id")
