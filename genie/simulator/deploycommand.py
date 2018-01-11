@@ -48,8 +48,8 @@ class DeployCommand():
                 "work_dir": "{0}/nrn-7.2{1}".format(self.neuron_path, tmp_str)
             },
                 {
-                "command": "./make_special_x86_64.sh",
-                "args": [bench],
+                "command": "./make_special.sh",
+                "args": ["x86_64", bench],
                 "options": [],
                 "work_dir": "{0}/specials{1}".format(self.neuron_path, tmp_str)
             }]
@@ -91,12 +91,6 @@ class DeployCommand():
                 "work_dir": "{0}/nrn-7.2{1}".format(self.neuron_path, tmp_str)
             },
                 {
-                "command": "../../genie/simulator/tmp/build_config.sh",
-                "args": [],
-                "options": [],
-                "work_dir": "{0}/nrn-7.2{1}".format(self.neuron_path, tmp_str)
-            },
-                {
                 "command": "make",
                 "args": [],
                 "options": [],
@@ -115,9 +109,9 @@ class DeployCommand():
                 "work_dir": "{0}/exec{1}".format(self.neuron_path, tmp_str)
             },
                 {
-                "command": "./make_special_sparc64.sh",
+                "command": "./make_special.sh",
                 "args": [],
-                "options": [],
+                "options": ["x86_64", bench],
                 "work_dir": "{0}/specials{1}".format(self.neuron_path, tmp_str)
             }]
         self.shell.run_cmds(commands)
