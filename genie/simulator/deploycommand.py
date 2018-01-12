@@ -19,7 +19,7 @@ class DeployCommand():
         self.job_generator = JobGenerator(job_name)
 
     def build(self, env, bench, params, use_tmp):
-        self.build_generator.gen(params, use_tmp, self.env.get_env())
+        self.build_generator.gen(params, use_tmp, env)
         commands = []
         tmp_str = ".tmp" if use_tmp else ""
         if env == "cluster":

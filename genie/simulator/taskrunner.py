@@ -116,9 +116,12 @@ class TaskRunner:
                     m = job_cluster_exp.match(line)
                     if m is not None:
                         state = m.group("state")
-                        if job_id == m.group("id") and state == "C":
-                            return False
-            return True
+                        if job_id == m.group("id"):
+                            if state == "C":
+                                return False
+                            else:
+                                return True
+            return False
         elif self.environment == "k":
             res = self.shell.execute("pjstat", [], [], "")[0]
             if type(res) is bytes:

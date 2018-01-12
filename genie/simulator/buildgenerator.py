@@ -16,6 +16,7 @@ class BuildGenerator(Generator):
             env = "x86_64"
         elif env == "k":
             env = "sparc64"
+        print(use_tmp, neuron_path, specials_path)
         tmp = self.contents["build"]['template'].render(
             neuron_path=neuron_path,
             config_path=self.contents["build_config"]['output_file'],
