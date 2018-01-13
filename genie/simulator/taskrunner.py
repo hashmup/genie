@@ -121,7 +121,7 @@ class TaskRunner:
                                 return False
                             else:
                                 return True
-            return False
+            return True
         elif self.environment == "k":
             res = self.shell.execute("pjstat", [], [], "")[0]
             if type(res) is bytes:
@@ -172,14 +172,10 @@ class TaskRunner:
                 self.timer_.cancel()
                 self.first = False
                 sorted_table = self.result_table.sort_values(by="time")\
-                    .reset_index(drop=True)
+                    .reset_index(drop=True)[:math.ceil(len(sorted_table)/4.0)]
                 self.job_total_num = 0
-                self.result_table =\
-                    pd.DataFrame(columns=sorted_table.columns)
-                self.result_table = pd.concat(
-                    [self.result_table,
-                     sorted_table[:math.ceil(len(sorted_table) / 4.0)]])
-                for i in range(math.ceil(len(sorted_table) / 4.0)):
+                self.result_table = sorted_table.sort_values(by="bench")
+                for i in range(sorted_table):
                     job_id = sorted_table['job_id'][i]
                     build = self.candidate_jobs[job_id]["build_param"]
                     job = self.candidate_jobs[job_id]["job_param"]
@@ -197,7 +193,7 @@ class TaskRunner:
             self.pending_jobs = self.pending_jobs_bak[:]
             self.run()
             return
-        self.timer_ = threading.Timer(10.0, self.watch_job)
+        self.timer_ = threading.Timer(5.0, self.watch_job)
         self.timer_.start()
 
     def run(self):
@@ -208,7 +204,7 @@ class TaskRunner:
             num = self.current_job_num
             self.lock.release()
             if num > self.MAX_NUM_JOBS:
-                time.sleep(10)
+                time.sleep(5)
             while True:
                 self.lock.acquire()
                 num = self.current_job_num
