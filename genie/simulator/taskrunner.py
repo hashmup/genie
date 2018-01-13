@@ -32,7 +32,7 @@ class TaskRunner:
         self.current_job_num = 0
         self.pending_jobs = []
         self.pending_jobs_bak = []
-        self.running_jobs = []
+        self.running_jobs = defaultdict(dict)
         self.candidate_jobs = defaultdict(dict)
         self.current_build_param = None
         self.current_bench = True
@@ -84,7 +84,8 @@ class TaskRunner:
                                 self.relation_table[job_id] = key
             self.current_build_param = build_param
             self.current_bench = is_bench
-            self.running_jobs.append(job_id)
+            self.running_jobs[job_id] = 0
+            # self.running_jobs.append(job_id)
             if self.first:
                 merge_params =\
                     dict(**build_param,
@@ -120,8 +121,13 @@ class TaskRunner:
                             if state == "C":
                                 return False
                             else:
+                                if self.running_jobs[job_id] == 0:
+                                    self.running_jobs[job_id] = 1
                                 return True
-            return True
+            if self.running_jobs[job_id] > 0:
+                return False
+            else:
+                return True
         elif self.environment == "k":
             res = self.shell.execute("pjstat", [], [], "")[0]
             if type(res) is bytes:
@@ -133,30 +139,35 @@ class TaskRunner:
                     if m is not None:
                         state = m.group("state")
                         if job_id == m.group("id"):
+                            if self.running_jobs[job_id] == 0:
+                                self.running_jobs[job_id] = 1
                             return True
-            return False
+            if self.running_jobs[job_id] > 0:
+                return False
+            else:
+                return True
 
     def watch_job(self):
         print("{0}/{1} {2}".format(self.job_total_num - len(self.pending_jobs),
                                    self.job_total_num, str(datetime.now())))
         self.lock.acquire()
-        for i in range(len(self.running_jobs)):
-            if not self.is_job_still_running(self.running_jobs[i]):
+        for job_id in self.running_jobs:
+            if not self.is_job_still_running(job_id):
                 # print("complete {0}".format(self.running_jobs[i]))
                 self.current_job_num -= 1
-                job_cnt = self.relation_table_job_cnt[self.running_jobs[i]]
-                time = self.summarizer.summary(self.running_jobs[i], job_cnt)
+                job_cnt = self.relation_table_job_cnt[job_id]
+                time = self.summarizer.summary(job_id, job_cnt)
                 if self.first:
-                    key = self.result_table['job_id'] == self.running_jobs[i]
+                    key = self.result_table['job_id'] == job_id
                 else:
                     key = self.result_table['job_id'] ==\
-                          self.relation_table[self.running_jobs[i]]
+                          self.relation_table[job_id]
                 if self.first:
                     self.result_table.loc[key, 'time'] = time
                 else:
                     self.result_table.loc[key, 'time'] += time
                 self.complete = True
-                del self.running_jobs[i]
+                del self.running_jobs[job_id]
                 break
         self.lock.release()
 
@@ -175,7 +186,7 @@ class TaskRunner:
                     .reset_index(drop=True)[:math.ceil(len(sorted_table)/4.0)]
                 self.job_total_num = 0
                 self.result_table = sorted_table.sort_values(by="bench")
-                for i in range(sorted_table):
+                for i in range(len(sorted_table)):
                     job_id = sorted_table['job_id'][i]
                     build = self.candidate_jobs[job_id]["build_param"]
                     job = self.candidate_jobs[job_id]["job_param"]

@@ -1,13 +1,10 @@
 import os
-from transpiler.neuron.neuron_func import NeuronFunc
-from transpiler.neuron.ode import ODE
-from transpiler.neuron.reg import Reg
-from transpiler.neuron.user_func import UserFunc
-from transpiler.neuron.variable import Variable
+import re
+from os.path import join, dirname, abspath
+from textx.model import children_of_type, parent_of_type
+from itertools import chain
 from transpiler.parser.lems import LemsCompTypeGenerator
 from utils.fileutil import *
-from os.path import join, dirname, abspath
-from jinja2 import Environment, FileSystemLoader
 
 
 ROOT = abspath(dirname(__file__))
@@ -16,17 +13,29 @@ ROOT = abspath(dirname(__file__))
 class Analyzer():
     def __init__(self):
         self.lems_comp_type_generator = LemsCompTypeGenerator()
-        self.neuron_func = NeuronFunc()
-        self.ode = ODE()
-        self.reg = Reg()
-        self.user_func = UserFunc()
-        self.variable = Variable()
 
     def parse(self):
         with open(self.path, "r") as f:
             data = f.read()
         self.lems_comp_type_generator.compile_to_string(data)
         return self.lems_comp_type_generator.root
+
+    def parse_into_token(self, exp):
+        term_exp = re.compile("[\(\)\+\-\/\*\=\{\}\s]")
+        start = 0
+        pos = 0
+        tokens = []
+        # we need this in case that we have a token at the end
+        exp += " "
+        while pos < len(exp):
+            m = term_exp.match(exp[pos])
+            if m:
+                token = exp[start:pos]
+                if token:
+                    tokens.append(token)
+                start = pos + 1
+            pos += 1
+        return list(set(tokens))
 
     def gen(self, path):
         self.path = path
@@ -35,18 +44,42 @@ class Analyzer():
             self.get_output_filepath(),
             self.compile())
 
-    def get_symbols(self, path):
+    def get_all_symbols(self, path):
+        symbols = self.get_derivative_symbols(path) +\
+                  self.get_breakpoint_symbols(path) +\
+                  self.get_global_symbols(path)
+        return set(list(chain.from_iterable(symbols)))
+
+    def get_table_candidate(self, path):
+        derivative_sym = self.get_derivative_symbols(path)
+        breakpoint_sym = self.get_breakpoint_symbols(path)
+        global_sym = self.get_global_symbols(path)
+        pass
+
+    def get_symbols(self, path, stmt_type):
         self.path = path
-        return self.parse()
+        root = self.parse()
+        symbols = []
+        stmts = children_of_type(stmt_type, root)[0].b.stmts
+        for stmt in stmts:
+            if hasattr(stmt, 'expression'):
+                if stmt.expression.lems:
+                    tokens = self.parse_into_token(stmt.expression.lems)
+                    if len(tokens):
+                        symbols.append(tokens)
+        return symbols
 
-    def get_filename(self):
-        base = os.path.basename(self.path)
-        return os.path.splitext(base)[0]
+    def get_derivative_symbols(self, path):
+        return self.get_symbols(path, 'Derivative')
 
-    def get_output_filepath(self):
-        return os.path.join(
-            join(ROOT, 'tmp'), "{0}.c".format(self.get_filename())
-        )
+    def get_breakpoint_symbols(self, path):
+        return self.get_symbols(path, 'Breakpoint')
 
-    def setup_dir(self):
-        mkdir(join(ROOT, 'tmp'))
+    def get_global_symbols(self, path):
+        self.path = path
+        root = self.parse()
+        symbols = []
+        global_syms = children_of_type('Global', root)[0].globals
+        for global_sym in global_syms:
+            symbols.append(global_sym.name)
+        return [symbols]
