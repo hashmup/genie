@@ -62,11 +62,23 @@ class Analyzer():
         symbols = []
         stmts = children_of_type(stmt_type, root)[0].b.stmts
         for stmt in stmts:
+            tokens = []
+            if hasattr(stmt, 'variable'):
+                if stmt.variable:
+                    if hasattr(stmt.variable, 'lems'):
+                        exp = stmt.variable.lems
+                    else:
+                        exp = stmt.variable
+                    tokens_lhs = self.parse_into_token(exp)
+                    if len(tokens_lhs):
+                        tokens.append(tokens_lhs)
             if hasattr(stmt, 'expression'):
                 if stmt.expression.lems:
-                    tokens = self.parse_into_token(stmt.expression.lems)
-                    if len(tokens):
-                        symbols.append(tokens)
+                    tokens_rhs = self.parse_into_token(stmt.expression.lems)
+                    if len(tokens_rhs):
+                        tokens.append(tokens_rhs)
+            if len(tokens):
+                symbols.append(list(chain.from_iterable(tokens)))
         return symbols
 
     def get_derivative_symbols(self, path):
@@ -83,3 +95,14 @@ class Analyzer():
         for global_sym in global_syms:
             symbols.append(global_sym.name)
         return [symbols]
+
+
+class UnionFindToken:
+    """
+    " Union-Find tree structure only for categorizing tokens.
+    """
+    def __init__(self, tokens):
+        """
+        " tokens: [[token, token,...], [token, token,...], [token, token,...]]
+        """
+        pass

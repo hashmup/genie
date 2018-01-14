@@ -58,7 +58,9 @@ class TaskRunner:
         self.job_total_num += 1
 
     def deploy_job(self):
-        if len(self.pending_jobs) > 0:
+        num = len(self.pending_jobs)
+        self.lock.release()
+        if num > 0:
             self.lock.acquire()
             build_param, job_param, is_bench = self.pending_jobs.pop(0)
             shouldBuild = self.current_build_param != build_param or\
@@ -182,8 +184,9 @@ class TaskRunner:
                 self.result_table.to_csv("result_all.csv")
                 self.timer_.cancel()
                 self.first = False
+                index = math.ceil(len(self.result_table)/4.0)
                 sorted_table = self.result_table.sort_values(by="time")\
-                    .reset_index(drop=True)[:math.ceil(len(sorted_table)/4.0)]
+                    .reset_index(drop=True)[:index]
                 self.job_total_num = 0
                 self.result_table = sorted_table.sort_values(by="bench")
                 for i in range(len(sorted_table)):
@@ -208,14 +211,13 @@ class TaskRunner:
         self.timer_.start()
 
     def run(self):
-        t = threading.Thread(target=self.watch_job)
-        t.start()
+        threading.Thread(target=self.watch_job).start()
         while len(self.pending_jobs) != 0:
             self.lock.acquire()
             num = self.current_job_num
             self.lock.release()
             if num > self.MAX_NUM_JOBS:
-                time.sleep(5)
+                time.sleep(15)
             while True:
                 self.lock.acquire()
                 num = self.current_job_num
@@ -226,7 +228,7 @@ class TaskRunner:
                 # print(self.current_job_num,
                 #       len(self.pending_jobs),
                 #       len(self.running_jobs))
-                self.deploy_job()
+                threading.Thread(target=self.deploy_job).start()
                 self.lock.acquire()
                 self.current_job_num += 1
                 self.lock.release()
