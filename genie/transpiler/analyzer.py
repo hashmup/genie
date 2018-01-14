@@ -1,6 +1,7 @@
 import os
 import re
 from os.path import join, dirname, abspath
+from collections import defaultdict
 from textx.model import children_of_type, parent_of_type
 from itertools import chain
 from transpiler.parser.lems import LemsCompTypeGenerator
@@ -50,11 +51,21 @@ class Analyzer():
                   self.get_global_symbols(path)
         return set(list(chain.from_iterable(symbols)))
 
+    def remove_token(self, candidate, remove_list):
+        li = [[] for x in range(len(candidate))]
+        for i in range(len(candidate)):
+            li[i] = [x for x in candidate[i] if x not in remove_list[0]]
+        return li
+
     def get_table_candidate(self, path):
         derivative_sym = self.get_derivative_symbols(path)
         breakpoint_sym = self.get_breakpoint_symbols(path)
         global_sym = self.get_global_symbols(path)
-        pass
+        derivative_sym = self.remove_token(derivative_sym, global_sym)
+        breakpoint_sym = self.remove_token(breakpoint_sym, global_sym)
+        table_candidate = derivative_sym + breakpoint_sym
+        uft = UnionFindToken(table_candidate)
+        return uft.get_related_tokens()
 
     def get_symbols(self, path, stmt_type):
         self.path = path
@@ -105,4 +116,38 @@ class UnionFindToken:
         """
         " tokens: [[token, token,...], [token, token,...], [token, token,...]]
         """
-        pass
+        # make flatten table of tokens
+        self.table = list(set(list(chain.from_iterable(tokens))))
+        self.translate_table = defaultdict(dict)
+        self._parent = [x for x in range(len(self.table))]
+        self._rank = [0] * len(self.table)
+        for i in range(len(self.table)):
+            self.translate_table[self.table[i]] = i
+        for _tokens in tokens:
+            if len(_tokens):
+                for token in _tokens[1:]:
+                    self.unite(self.translate_table[_tokens[0]],
+                               self.translate_table[token])
+
+    def get_related_tokens(self):
+        tokens = [[] for i in range(len(self.table))]
+        for i in range(len(self.table)):
+            root = self.find(i)
+            tokens[root].append(self.table[i])
+        return [x for x in tokens if x != []]
+
+    def find(self, x):
+        if self._parent[x] != x:
+            self._parent[x] = self.find(self._parent[x])
+        return self._parent[x]
+
+    def unite(self, x, y):
+        root_x = self.find(x)
+        root_y = self.find(y)
+        if x != y:
+            if self._rank[x] < self._rank[y]:
+                self._parent[x] = y
+            else:
+                self._parent[y] = x
+                if self._rank[x] == self._rank[y]:
+                    self._rank[x] += 1

@@ -210,9 +210,11 @@ class TaskRunner:
                 self.result_table['avg_time'] = self.result_table['time'] / 4.0
                 self.result_table.to_csv("result_candidate.csv")
                 self.timer_.cancel()
+                self.pending_lock.release()
                 return
             self.pending_jobs = self.pending_jobs_bak[:]
             self.run()
+            self.pending_lock.release()
             return
         self.timer_ = threading.Timer(5.0, self.watch_job)
         self.timer_.start()
