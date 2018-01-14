@@ -42,6 +42,7 @@ class TaskRunner:
         self.verifier = Verifier()
         self.environment = environment
         self.result_table = pd.DataFrame()
+        self.compile_lock = threading.Lock()
         self.current_lock = threading.Lock()
         self.pending_lock = threading.Lock()
         self.running_lock = threading.Lock()
@@ -243,11 +244,13 @@ class TaskRunner:
     def deploy(self, shouldBuild, build_params, job_params, is_bench):
         if shouldBuild:
             self.use_tmp = not self.use_tmp
+            self.compile_lock.acquire()
             self.compiler.gen("neuron_kplus/mod/hh_k.mod")
             self.deployCommand.build(self.environment,
                                      is_bench,
                                      build_params,
                                      self.use_tmp)
+            self.compile_lock.release()
         self.job_cnt += 1
         return self.deployCommand.run(self.environment,
                                       job_params,
