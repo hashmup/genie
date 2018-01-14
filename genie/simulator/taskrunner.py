@@ -58,6 +58,7 @@ class TaskRunner:
         self.job_total_num += 1
 
     def deploy_job(self):
+        self.lock.acquire()
         num = len(self.pending_jobs)
         self.lock.release()
         if num > 0:
@@ -152,6 +153,7 @@ class TaskRunner:
     def watch_job(self):
         print("{0}/{1} {2}".format(self.job_total_num - len(self.pending_jobs),
                                    self.job_total_num, str(datetime.now())))
+        print(self.running_jobs)
         self.lock.acquire()
         for job_id in self.running_jobs:
             if not self.is_job_still_running(job_id):
