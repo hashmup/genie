@@ -42,7 +42,9 @@ class TaskRunner:
         self.verifier = Verifier()
         self.environment = environment
         self.result_table = pd.DataFrame()
-        self.lock = threading.Lock()
+        self.current_lock = threading.Lock()
+        self.pending_lock = threading.Lock()
+        self.running_lock = threading.Lock()
         self.relation_table = defaultdict(dict)
         self.relation_table_job_cnt = defaultdict(dict)
         self.deployCommand = DeployCommand(neuron_path)
@@ -58,11 +60,13 @@ class TaskRunner:
         self.job_total_num += 1
 
     def deploy_job(self):
+        self.pending_lock.acquire()
         num = len(self.pending_jobs)
-        self.lock.release()
+        self.pending_lock.release()
         if num > 0:
-            self.lock.acquire()
+            self.pending_lock.acquire()
             build_param, job_param, is_bench = self.pending_jobs.pop(0)
+            self.pending_lock.release()
             shouldBuild = self.current_build_param != build_param or\
                 self.current_bench != is_bench
             job_id = self.deploy(shouldBuild,
@@ -86,7 +90,9 @@ class TaskRunner:
                                 self.relation_table[job_id] = key
             self.current_build_param = build_param
             self.current_bench = is_bench
+            self.running_lock.acquire()
             self.running_jobs[job_id] = 0
+            self.running_lock.release()
             # self.running_jobs.append(job_id)
             if self.first:
                 merge_params =\
@@ -106,7 +112,6 @@ class TaskRunner:
                         self.result_table.loc[-1, key] = merge_params[key]
                 self.result_table.index = self.result_table.index + 1
                 self.result_table = self.result_table.sort_index()
-            self.lock.release()
 
     def is_job_still_running(self, job_id):
         if self.environment == "cluster":
@@ -152,7 +157,7 @@ class TaskRunner:
     def watch_job(self):
         print("{0}/{1} {2}".format(self.job_total_num - len(self.pending_jobs),
                                    self.job_total_num, str(datetime.now())))
-        self.lock.acquire()
+        self.running_lock.acquire()
         for job_id in self.running_jobs:
             if not self.is_job_still_running(job_id):
                 # print("complete {0}".format(self.running_jobs[i]))
@@ -171,8 +176,9 @@ class TaskRunner:
                 self.complete = True
                 del self.running_jobs[job_id]
                 break
-        self.lock.release()
+        self.running_lock.release()
 
+        self.pending_lock.acquire()
         if len(self.pending_jobs) == 0 and len(self.running_jobs) == 0\
                 and self.complete:
             print('verifyyyyy')
@@ -209,19 +215,20 @@ class TaskRunner:
             return
         self.timer_ = threading.Timer(5.0, self.watch_job)
         self.timer_.start()
+        self.pending_lock.release()
 
     def run(self):
         threading.Thread(target=self.watch_job).start()
         while len(self.pending_jobs) != 0:
-            self.lock.acquire()
+            self.current_lock.acquire()
             num = self.current_job_num
-            self.lock.release()
+            self.current_lock.release()
             if num > self.MAX_NUM_JOBS:
                 time.sleep(15)
             while True:
-                self.lock.acquire()
+                self.current_lock.acquire()
                 num = self.current_job_num
-                self.lock.release()
+                self.current_lock.release()
                 if num >= self.MAX_NUM_JOBS:
                     break
                 # print(self.running_jobs)
@@ -229,9 +236,9 @@ class TaskRunner:
                 #       len(self.pending_jobs),
                 #       len(self.running_jobs))
                 threading.Thread(target=self.deploy_job).start()
-                self.lock.acquire()
+                self.current_lock.acquire()
                 self.current_job_num += 1
-                self.lock.release()
+                self.current_lock.release()
 
     def deploy(self, shouldBuild, build_params, job_params, is_bench):
         if shouldBuild:
