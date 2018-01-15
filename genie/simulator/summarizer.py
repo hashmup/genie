@@ -1,3 +1,5 @@
+from pathlib import Path
+import time
 import re
 import sys
 from utils.shell import Shell
@@ -22,23 +24,26 @@ class Summarizer:
         self.shell = Shell()
 
     def summary(self, job_id, job_cnt):
-        time = self.obtain_time("job{0}.sh.o{1}".format(job_cnt, job_id))
+        core_time = self.obtain_time("job{0}.sh.o{1}".format(job_cnt, job_id))
 
         # self.clean_up(job_type, job_id)
         self.clean_up(job_cnt, job_id)
-        return time
+        return core_time
 
     def obtain_time(self, filename):
+        f_check = Path("{0}{1}".format(dir_path, filename))
+        while not f_check.exists():
+            time.sleep(5)
         f = open("{0}{1}".format(dir_path, filename))
         lines = f.readlines()
         f.close()
         for line in lines:
             m = time_exp.match(line)
             if m:
-                time = int(m.group("decimal")) +\
+                calc_time = int(m.group("decimal")) +\
                     int(m.group("float")) * 10**(-len(m.group("float"))+1)
-                print(time)
-                return time
+                print(calc_time)
+                return calc_time
 
     def clean_up(self, job_cnt, job_id):
         self.shell.execute(
