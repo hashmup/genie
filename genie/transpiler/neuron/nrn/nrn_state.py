@@ -43,15 +43,15 @@ class NrnState():
                "#pragma loop norecurrence\n"\
                "\tfor (_iml = 0; _iml < _cntml; _iml++) {\n"
         for param in children_of_type('Global', root)[0].globals:
-            code += "\t\tFLOAT {0};\n".format(param.name)
+            code += "\t\tFLOAT _{0};\n".format(param.name)
         code += "\t\tint v_i = _i_table[_iml];\n"\
                 "\t\tFLOAT theta = _theta_table[_iml];\n"
         for param in children_of_type('Global', root)[0].globals:
             code += "\t\t{0} = TABLE_{1}(v_i);\n"\
                     .format(param.name, param.name.upper())
         for state in children_of_type('State', root)[0].state_vars:
-            code += "\t\t{0}_table[_iml] += (1.0f - EXP(-local_dt/{0}tau))"\
-                    " * ({0}inf + theta * (TABLE_{1}INF(v_i + 1) - {0}inf)"\
+            code += "\t\t{0}_table[_iml] += (1.0f - EXP(-local_dt/_{0}tau))"\
+                    " * (_{0}inf + theta * (TABLE_{1}INF(v_i + 1) - _{0}inf)"\
                     " - {0}_table[_iml]);\n"\
                     .format(state.name, state.name.upper())
         code += "\t}\n"

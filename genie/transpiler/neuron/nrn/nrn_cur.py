@@ -175,6 +175,8 @@ class NrnCur():
                 code += "\t\tvec_rhs[_ni[_iml]] -= il_table[_iml];\n"
             code += "\t}\n"
             code += loop_prefix
+            code += "double* _p = _ml->_data[_iml];\n"\
+                    "Datum* _ppvar = _ml->_pdata[_iml];\n"
             for ion in children_of_type('UseIon', root):
                 code += "\t\t{0};\n"\
                         .format(

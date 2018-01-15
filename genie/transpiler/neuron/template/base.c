@@ -7,12 +7,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include "scoplib_ansi.h"
+#include "scoplib.h"
 #undef PI
 #define nil 0
 #include "md1redef.h"
 #include "section.h"
-#include "nrniv_mf.h"
 #include "md2redef.h"
 
 #if METHOD3

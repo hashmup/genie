@@ -19,7 +19,7 @@ clean-dir:
 	rm -rf neuron_kplus/specials.tmp
 
 clean-log:
-	rm -rf neuron_kplus/hoc/job_*.sh.*
+	rm -rf neuron_kplus/hoc/job*.sh.*
 	rm -rf result.csv
 	rm -rf result_all.csv
 	rm -rf result_candidate.csv

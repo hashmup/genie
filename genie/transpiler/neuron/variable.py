@@ -191,7 +191,7 @@ class Variable():
             code = ""
             for i in range(len(macro_table)):
                 code += "static double opt_table{0}"\
-                        "[BUFFER_SIZE * MAX_NTHREADS][{1}]\n"\
+                        "[BUFFER_SIZE * MAX_NTHREADS][{1}];\n"\
                         .format(i, len(macro_table[i]))
                 for j in range(len(macro_table[i])):
                     code += "#define TABLE_{0}(x) "\

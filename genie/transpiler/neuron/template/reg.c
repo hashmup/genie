@@ -1,3 +1,10 @@
+/* connect user functions to hoc names */
+static IntFunc hoc_intfunc[] = {
+  "setdata_{{ filename }}", _hoc_setdata,
+  "rates_{{ filename }}", _hoc_rates,
+  "vtrap_{{ filename }}", _hoc_vtrap,
+  0, 0
+};
 // This file will contain functions related to xxx_reg
 
 void _{{ filename }}_reg() {
@@ -22,7 +29,6 @@ void _{{ filename }}_reg() {
 
   // common
   _mechtype = nrn_get_mechtype(_mechanism[1]);
-  _nrn_setdata_reg(_mechtype, _setdata);
 
   _nrn_thread_reg(_mechtype, 1, _thread_mem_init);
   _nrn_thread_reg(_mechtype, 0, _thread_cleanup);

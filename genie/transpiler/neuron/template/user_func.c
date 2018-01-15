@@ -1,16 +1,8 @@
-/* connect user functions to hoc names */
-static VoidFunc hoc_intfunc[] = {
-  "setdata_{{ filename }}", _hoc_setdata,
-  "rates_{{ filename }}", _hoc_rates,
-  "vtrap_{{ filename }}", _hoc_vtrap,
-  0, 0
-};
-
 static void _hoc_setdata() {
   Prop *_prop, *hoc_getdata_range(int);
   _prop = hoc_getdata_range(_mechtype);
   _setdata(_prop);
-  hoc_retpushx(1.);
+  ret(1.);
 }
 
 static void _setdata(Prop* _prop) {
@@ -36,7 +28,7 @@ static void _hoc_rates(void) {
   _check_rates(_p, _ppvar, _thread, _nt);
   _r = 1.;
   rates( _p, _ppvar, _thread, _nt, *getarg(1));
-  hoc_retpushx(_r);
+  ret(_r);
 }
 
 static void _check_rates(double* _p, Datum* _ppvar, Datum* _thread, _NrnThread* _nt) {
@@ -130,7 +122,7 @@ static void _hoc_vtrap(void) {
   _thread = _extcall_thread;
   _nt = nrn_threads;
   _r =  vtrap(_p, _ppvar, _thread, _nt, *getarg(1), *getarg(2));
-  hoc_retpushx(_r);
+  ret(_r);
 }
 
 double vtrap (_threadargsprotocomma_ double _lx , double _ly) {

@@ -36,7 +36,7 @@ class TaskRunner:
         self.running_jobs = defaultdict(dict)
         self.candidate_jobs = defaultdict(dict)
         self.current_build_param = None
-        self.current_bench = False
+        self.current_bench = True
         self.shell = Shell()
         self.summarizer = Summarizer()
         self.compiler = Compiler()
@@ -235,7 +235,7 @@ class TaskRunner:
                 self.current_lock.acquire()
                 num = self.current_job_num
                 self.current_lock.release()
-                if num >= self.MAX_NUM_JOBS or num >= len(self.pending_jobs):
+                if num >= self.MAX_NUM_JOBS or num >= self.job_total_num:
                     break
                 threading.Thread(target=self.deploy_job).start()
                 self.current_lock.acquire()
@@ -244,18 +244,18 @@ class TaskRunner:
 
     def deploy(self, shouldBuild, build_params, job_params, is_bench):
         if shouldBuild:
-            self.use_tmp = not self.use_tmp
             self.compile_lock.acquire()
+            self.use_tmp = not self.use_tmp
             path = "neuron_kplus/mod/hh_k.mod"
             macro_table = self.analyzer.get_table_candidate(path)
             if is_bench:
                 macro_table = None
             self.compiler.gen(path, macro_table)
+            self.compile_lock.release()
             self.deployCommand.build(self.environment,
                                      is_bench,
                                      build_params,
                                      self.use_tmp)
-            self.compile_lock.release()
         self.job_cnt += 1
         return self.deployCommand.run(self.environment,
                                       job_params,
