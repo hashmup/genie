@@ -71,7 +71,7 @@ class Reg():
                     .format(param.name)
         return code
 
-    def compile(self, filename, root):
+    def compile(self, filename, root, table_order):
         tokens = self.gen(root)
         tokens.update({"filename": filename}.items())
         return self.jinja_template.render(**tokens)

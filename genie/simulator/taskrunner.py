@@ -7,6 +7,7 @@ from simulator.verifier import Verifier
 from simulator.deploycommand import DeployCommand
 from collections import defaultdict
 from transpiler.compiler import Compiler
+from transpiler.analyzer import Analyzer
 from datetime import datetime
 import pandas as pd
 import numpy as np
@@ -39,6 +40,7 @@ class TaskRunner:
         self.shell = Shell()
         self.summarizer = Summarizer()
         self.compiler = Compiler()
+        self.analyzer = Analyzer()
         self.verifier = Verifier()
         self.environment = environment
         self.result_table = pd.DataFrame()
@@ -67,6 +69,8 @@ class TaskRunner:
         if num > 0:
             self.pending_lock.acquire()
             build_param, job_param, is_bench = self.pending_jobs.pop(0)
+            self.current_build_param = build_param
+            self.current_bench = is_bench
             self.pending_lock.release()
             shouldBuild = self.current_build_param != build_param or\
                 self.current_bench != is_bench
@@ -89,11 +93,8 @@ class TaskRunner:
                         and job == job_param\
                             and bench == is_bench:
                                 self.relation_table[job_id] = key
-            self.current_build_param = build_param
-            self.current_bench = is_bench
             self.running_lock.acquire()
             self.running_jobs[job_id] = 0
-            self.running_lock.release()
             # self.running_jobs.append(job_id)
             if self.first:
                 merge_params =\
@@ -113,6 +114,7 @@ class TaskRunner:
                         self.result_table.loc[-1, key] = merge_params[key]
                 self.result_table.index = self.result_table.index + 1
                 self.result_table = self.result_table.sort_index()
+            self.running_lock.release()
 
     def is_job_still_running(self, job_id):
         if self.environment == "cluster":
@@ -233,12 +235,8 @@ class TaskRunner:
                 self.current_lock.acquire()
                 num = self.current_job_num
                 self.current_lock.release()
-                if num > self.MAX_NUM_JOBS:
+                if num >= self.MAX_NUM_JOBS:
                     break
-                # print(self.running_jobs)
-                # print(self.current_job_num,
-                #       len(self.pending_jobs),
-                #       len(self.running_jobs))
                 threading.Thread(target=self.deploy_job).start()
                 self.current_lock.acquire()
                 self.current_job_num += 1
@@ -248,7 +246,11 @@ class TaskRunner:
         if shouldBuild:
             self.use_tmp = not self.use_tmp
             self.compile_lock.acquire()
-            self.compiler.gen("neuron_kplus/mod/hh_k.mod")
+            path = "neuron_kplus/mod/hh_k.mod"
+            macro_table = self.analyzer.get_table_candidate(path)
+            if is_bench:
+                macro_table = None
+            self.compiler.gen(path, macro_table)
             self.deployCommand.build(self.environment,
                                      is_bench,
                                      build_params,

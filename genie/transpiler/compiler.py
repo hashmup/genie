@@ -34,23 +34,23 @@ class Compiler():
         self.lems_comp_type_generator.compile_to_string(data)
         return self.lems_comp_type_generator.root
 
-    def compile(self):
+    def compile(self, table_order):
         root = self.parse()
         filename = self.get_filename()
         return self.jinja_template.render(
-            global_variable=self.variable.compile(filename, root),
-            reg=self.reg.compile(filename, root),
-            user_func=self.user_func.compile(filename, root),
-            ode_func=self.ode.compile(filename, root),
-            neuron_func=self.neuron_func.compile(filename, root)
+            global_variable=self.variable.compile(filename, root, table_order),
+            reg=self.reg.compile(filename, root, table_order),
+            user_func=self.user_func.compile(filename, root, table_order),
+            ode_func=self.ode.compile(filename, root, table_order),
+            neuron_func=self.neuron_func.compile(filename, root, table_order)
         )
 
-    def gen(self, path):
+    def gen(self, path, table_order):
         self.path = path
         self.setup_dir()
         write_file(
             self.get_output_filepath(),
-            self.compile())
+            self.compile(table_order))
 
     def get_symbols(self, path):
         self.path = path

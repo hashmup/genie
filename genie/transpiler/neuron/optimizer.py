@@ -41,15 +41,55 @@ class Optimizer():
         exp = exp.replace('}', '')
         return exp
 
-    def optimize(self, exp, tables, suffix):
+    def optimize_exp(self, exp, token_table, macro_table):
         """
         " Take Expression and possible tables
         " If we can use table, replace it in expression
         """
         # tokens = self.parse(exp)
-        for token in tables:
-            exp = self.check_and_replace_token(exp, token, suffix)
-        return exp
+        optimized_exp = ""
+        term_exp = re.compile("[\(\)\+\-\/\*\=\{\}\s]")
+        start = 0
+        pos = 0
+        tokens = []
+        # we need this in case that we have a token at the end
+        exp = exp.replace('{', '')
+        exp = exp.replace('}', '')
+        exp += " "
+        while pos < len(exp):
+            m = term_exp.match(exp[pos])
+            if m:
+                token = exp[start:pos]
+                if token:
+                    if macro_table and token in macro_table:
+                        optimized_exp += "TABLE_{0}(_iml)"\
+                                         .format(token.upper())
+                    elif token in token_table:
+                        optimized_exp += "_{0}_table[_iml]"\
+                                         .format(token)
+                    else:
+                        optimized_exp += token
+                optimized_exp += exp[pos]
+                start = pos + 1
+            pos += 1
+        return optimized_exp[:len(optimized_exp)-1]
+
+    def optimize_table_ptr(self, tab_size, token_table, macro_table):
+        """
+        " Take a list of tokens then generate pointer to table
+        """
+        code = ""
+        tab = "\t" * tab_size
+        for token in token_table:
+            if macro_table and token in macro_table:
+                code += "{0}double* {1}_table = "\
+                        "&(TABLE_{2}(BUFFER_SIZE * _nth->_id));\n"\
+                        .format(tab, token, token.upper())
+            else:
+                code += "{0}double* {1}_table = "\
+                        "&(_{1}_table[BUFFER_SIZE * _nth->_id]);\n"\
+                        .format(tab, token)
+        return code
 
     def parse(self, exp):
         """

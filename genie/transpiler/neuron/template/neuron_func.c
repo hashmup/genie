@@ -149,10 +149,7 @@ static void nrn_cur(_NrnThread* _nt, _Memb_list* _ml, int _type)
 
   const double *vec_v = _nt->_actual_v;
   double *vec_rhs = _nt->_actual_rhs;
-{{ nrn_cur.break_point_without_current }}
-#else
 {{ nrn_cur.break_point }}
-#endif
 
 #ifdef KPLUS_USE_FAPP_RANGE
   fapp_stop("nrn_cur", 31, 4);

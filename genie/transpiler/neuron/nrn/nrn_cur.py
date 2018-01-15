@@ -1,6 +1,7 @@
 import re
 from functools import reduce
 from collections import defaultdict
+from itertools import chain
 from transpiler.neuron.optimizer import Optimizer
 from textx.model import children_of_type, parent_of_type
 
@@ -9,13 +10,13 @@ class NrnCur():
     def __init__(self):
         self.optimizer = Optimizer()
 
-    def gen(self, root):
+    def gen(self, root, macro_table):
         return {
-            "link_table": self.get_link_table(root),
+            "link_table": self.get_link_table(root, macro_table),
             "break_point":
-            self.get_break_point(root),
-            "break_point_without_current":
-            self.get_break_point_without_current(root)
+            self.get_break_point(root, macro_table)
+            # "break_point_without_current":
+            # self.get_break_point_without_current(root)
         }
 
     def obtain_link_table(self, root):
@@ -27,92 +28,94 @@ class NrnCur():
             reduce(lambda x, y: x+y, ions) +\
             ['v', 'g']
 
-    def get_link_table(self, root):
+    def get_link_table(self, root, macro_table):
         code = ""
         params = self.obtain_link_table(root)
-        for param in params:
-            code += "\tdouble* {0}_table ="\
-                    " &(_{0}_table[BUFFER_SIZE * _nth->_id]);\n"\
-                    .format(param)
-        # code += "#ifndef KPLUS_WITHOUT_SHARED_CURRENT\n"
-        # code += "#endif\n"
-        return code
+        if macro_table:
+            flatten_table = list(chain.from_iterable(macro_table))
+        else:
+            flatten_table = []
+        return self.optimizer.optimize_table_ptr(tab_size=1,
+                                                 token_table=params,
+                                                 macro_table=flatten_table)
 
-    def get_break_point_without_current(self, root):
+    # def get_break_point_without_current(self, root):
+    #     """
+    #     " TODO: Still needs to figure out what these eqs mean.
+    #     """
+    #     code = ""
+    #     method = children_of_type('Breakpoint', root)[0].b.stmts[0].method
+    #     if method == "cnexp":
+    #         stmts = defaultdict(dict)
+    #         tables = self.obtain_link_table(root)
+    #         prefix = "#ifdef KPLUS_USE_MOD_OMP\n"\
+    #                  "#pragma omp for\n"\
+    #                  "#endif\n"\
+    #                  "#pragma loop noalias\n"\
+    #                  "#pragma loop norecurrence\n"
+    #         loop_prefix = "\tfor (_iml = 0; _iml < _cntml; _iml++) {\n"
+    #         code += "#ifdef KPLUS_WITHOUT_SHARED_CURRENT\n"\
+    #                 "#ifdef KPLUS_USE_MOD_OMP\n"\
+    #                 "#pragma omp parallel\n"\
+    #                 "#endif\n"\
+    #                 "{\n"
+    #         for stmt in children_of_type('Breakpoint', root)[0].b.stmts[1:]:
+    #             stmts[stmt.variable.lems] = stmt.expression.lems
+    #         # calculate v
+    #         code += prefix
+    #         code += loop_prefix
+    #         code += "\t\tv_table[_iml] = vec_v[_ni[_iml]];\n"\
+    #                 "\t}\n"
+    #         # core calculation
+    #         code += prefix
+    #         code += loop_prefix
+    #         # calculate g
+    #         g_ions = ""
+    #         for ion in children_of_type('UseIon', root):
+    #             target = "g{0}".format(ion.ion)
+    #             g_ions += " + _{0}".format(target)
+    #             exp = stmts[target]
+    #             code += "\t\tdouble _{0};\n".format(target)
+    #             code += "\t\t_{0} = {1};\n"\
+    #                     .format(target, self.optimizer.optimize_exp(exp,
+    #                                                                 tables,
+    #                                                                 None))
+    #         code += "\t\tg_table[_iml] = gl_table[_iml]{0};\n".format(g_ions)
+    #         # calculate i
+    #         i_ions = ""
+    #         for ion in children_of_type('UseIon', root):
+    #             target = ion.w[0].writes[0].name
+    #             i_ions += "+ _{0}".format(target)
+    #             exp = stmts[target]
+    #             code += "\t\tdouble _{0};\n".format(target)
+    #             code += "\t\t_{0} = {1};\n"\
+    #                     .format(target,
+    #                             self.optimizer.optimize_exp(exp,
+    #                                                         tables,
+    #                                                         None))
+    #         code += "\t\ti_table[_iml] = gl_table[_iml] * (v_table[_iml] - "\
+    #                 "el_table[_iml]) {0};\n"\
+    #                 .format(g_ions)
+    #         code += "\t}\n"
+    #
+    #         # calculate vec_rhs
+    #         code += prefix
+    #         code += loop_prefix
+    #         code += "\t\tvec_rhs[_ni[_iml]] -= il_table[_iml];\n"\
+    #                 "\t}\n"\
+    #                 "}\n"
+    #     return code
+
+    def get_break_point(self, root, macro_table):
         """
         " TODO: Still needs to figure out what these eqs mean.
         """
         code = ""
         method = children_of_type('Breakpoint', root)[0].b.stmts[0].method
-        if method == "cnexp":
-            stmts = defaultdict(dict)
-            tables = self.obtain_link_table(root)
-            prefix = "#ifdef KPLUS_USE_MOD_OMP\n"\
-                     "#pragma omp for\n"\
-                     "#endif\n"\
-                     "#pragma loop noalias\n"\
-                     "#pragma loop norecurrence\n"
-            loop_prefix = "\tfor (_iml = 0; _iml < _cntml; _iml++) {\n"
-            code += "#ifdef KPLUS_WITHOUT_SHARED_CURRENT\n"\
-                    "#ifdef KPLUS_USE_MOD_OMP\n"\
-                    "#pragma omp parallel\n"\
-                    "#endif\n"\
-                    "{\n"
-            for stmt in children_of_type('Breakpoint', root)[0].b.stmts[1:]:
-                stmts[stmt.variable.lems] = stmt.expression.lems
-            # calculate v
-            code += prefix
-            code += loop_prefix
-            code += "\t\tv_table[_iml] = vec_v[_ni[_iml]];\n"\
-                    "\t}\n"
-            # core calculation
-            code += prefix
-            code += loop_prefix
-            # calculate g
-            g_ions = ""
-            for ion in children_of_type('UseIon', root):
-                target = "g{0}".format(ion.ion)
-                g_ions += " + _{0}".format(target)
-                exp = stmts[target]
-                code += "\t\tdouble _{0};\n".format(target)
-                code += "\t\t_{0} = {1};\n"\
-                        .format(target, self.optimizer.optimize(exp,
-                                                                tables,
-                                                                "_table[_iml]"
-                                                                ))
-            code += "\t\tg_table[_iml] = gl_table[_iml]{0};\n".format(g_ions)
-            # calculate i
-            i_ions = ""
-            for ion in children_of_type('UseIon', root):
-                target = ion.w[0].writes[0].name
-                i_ions += "+ _{0}".format(target)
-                exp = stmts[target]
-                code += "\t\tdouble _{0};\n".format(target)
-                code += "\t\t_{0} = {1};\n"\
-                        .format(target,
-                                self.optimizer.optimize(exp,
-                                                        tables,
-                                                        "_table[_iml]"
-                                                        ))
-            code += "\t\ti_table[_iml] = gl_table[_iml] * (v_table[_iml] - "\
-                    "el_table[_iml]) {0};\n"\
-                    .format(g_ions)
-            code += "\t}\n"
-
-            # calculate vec_rhs
-            code += prefix
-            code += loop_prefix
-            code += "\t\tvec_rhs[_ni[_iml]] -= il_table[_iml];\n"\
-                    "\t}\n"\
-                    "}\n"
-        return code
-
-    def get_break_point(self, root):
-        """
-        " TODO: Still needs to figure out what these eqs mean.
-        """
-        code = ""
-        method = children_of_type('Breakpoint', root)[0].b.stmts[0].method
+        if macro_table:
+            flatten_table = list(chain.from_iterable(macro_table))
+        else:
+            flatten_table = []
         if method == "cnexp":
             stmts = defaultdict(dict)
             tables = self.obtain_link_table(root)
@@ -121,8 +124,12 @@ class NrnCur():
                 stmts[stmt.variable.lems] = stmt.expression.lems
             # calculate v
             code += loop_prefix
-            code += "\t\tv_table[_iml] = vec_v[_ni[_iml]];\n"\
-                    "\t}\n"
+            if 'v' in flatten_table:
+                code += "\t\tTABLE_V(_iml) = vec_v[_ni[_iml]];\n"\
+                        "\t}\n"
+            else:
+                code += "\t\tv_table[_iml] = vec_v[_ni[_iml]];\n"\
+                        "\t}\n"
             # core calculation
             code += loop_prefix
             # calculate g
@@ -131,15 +138,15 @@ class NrnCur():
                 exp = stmts[target]
                 code += "\t\t{0};\n"\
                         .format(
-                            self.optimizer.optimize("{0} = {1}".format(
+                            self.optimizer.optimize_exp("{0} = {1}".format(
                                 target, exp),
                                 tables,
-                                "_table[_iml]"))
+                                flatten_table))
             code += "\t\t{0};\n"\
                     .format(
-                        self.optimizer.optimize("g = gna + gk + gl",
-                                                tables,
-                                                "_table[_iml]"))
+                        self.optimizer.optimize_exp("g = gna + gk + gl",
+                                                    tables,
+                                                    flatten_table))
             code += "\t}\n"
             code += loop_prefix
             # calculate i
@@ -149,25 +156,37 @@ class NrnCur():
                     exp = stmts[token]
                     code += "\t\t{0};\n"\
                             .format(
-                                self.optimizer.optimize("{0} = {1}".format(
+                                self.optimizer.optimize_exp("{0} = {1}".format(
                                     token, exp),
                                     tables,
-                                    "_table[_iml]"))
+                                    flatten_table))
             code += "\t\t{0};\n"\
                     .format(
-                        self.optimizer.optimize("il += ina + ik",
-                                                tables,
-                                                "_table[_iml]"))
+                        self.optimizer.optimize_exp("il += ina + ik",
+                                                    tables,
+                                                    flatten_table))
             code += "\t}\n"
 
             # calculate vec_rhs
             code += loop_prefix
-            code += "\t\tvec_rhs[_ni[_iml]] -= il_table[_iml];\n"\
-                    "\t}\n"
+            if 'il' in flatten_table:
+                code += "\t\tvec_rhs[_ni[_iml]] -= TABLE_IL(_iml);\n"
+            else:
+                code += "\t\tvec_rhs[_ni[_iml]] -= il_table[_iml];\n"
+            code += "\t}\n"
             code += loop_prefix
             for ion in children_of_type('UseIon', root):
-                code += "\t\t_ion_di{0}dv += g{0}_table[_iml];\n"\
-                        "\t\t_ion_i{0} += i{0}_table[_iml];\n"\
-                        .format(ion.ion)
+                code += "\t\t{0};\n"\
+                        .format(
+                            self.optimizer.optimize_exp(
+                                "_ion_di{0}dv += g{0}".format(ion.ion),
+                                tables,
+                                flatten_table))
+                code += "\t\t{0};\n"\
+                        .format(
+                            self.optimizer.optimize_exp(
+                                "_ion_i{0} += i{0}".format(ion.ion),
+                                tables,
+                                flatten_table))
             code += "\t}\n"
         return code

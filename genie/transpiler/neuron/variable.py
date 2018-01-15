@@ -19,7 +19,7 @@ class Variable():
         )
         self.version = "6.2.0"
 
-    def gen(self, root):
+    def gen(self, root, macro_table):
         return {
             "define_params": self.get_define_params(root),
             "define_ions": self.get_define_ions(root),
@@ -33,7 +33,7 @@ class Variable():
             "num_cvode": self.get_num_cvode(root),
             "mechanism": self.get_mechanism(root),
             "restruct_table": self.get_restruct_table(root),
-            "optimize_table": self.get_optimize_table(root),
+            "optimize_table": self.get_optimize_table(root, macro_table),
             "ion_symbol": self.get_ion_symbol(root)
         }
 
@@ -161,44 +161,54 @@ class Variable():
     def get_restruct_table(self, root):
         cnt = 0
         params = children_of_type('Global', root)[0].globals
-        code = "#ifdef RESTRUCT_TABLE\n"\
-               "#define TABLE_SIZE 201\n"\
+        # code = "#ifdef RESTRUCT_TABLE\n"\
+        code = "#define TABLE_SIZE 201\n"\
                "FLOAT {0}_table[TABLE_SIZE][{1}];\n"\
                .format(self.filename, len(params))
         for param in params:
             code += "#define TABLE_{0}(x) {1}_table[(x)][{2}]\n"\
                     .format(param.name.upper(), self.filename, cnt)
             cnt += 1
-        code += "#else\n"
-        for param in params:
-            code += "#define TABLE_{0}(x) _t_{1}[(x)]\n"\
-                    .format(param.name.upper(), param.name)
-        code += "#endif\n"
+        # code += "#else\n"
+        # for param in params:
+        #     code += "#define TABLE_{0}(x) _t_{1}[(x)]\n"\
+        #             .format(param.name.upper(), param.name)
+        # code += "#endif\n"
         return code
 
-    def get_optimize_table(self, root):
+    def get_optimize_table(self, root, macro_table):
         code = ""
+        ions = [[x.r[0].reads[0].name, x.w[0].writes[0].name]
+                for x in children_of_type('UseIon', root)]
         params = [x.name for x in children_of_type('Range', root)[0].ranges] +\
             children_of_type('Nonspecific', root)[0].nonspecifics +\
             [x.name for x in children_of_type('State', root)[0].state_vars] +\
-            ['v', 'g']
+            ['v', 'g'] +\
+            reduce(lambda x, y: x+y, ions)
+        # if we have ordered table, then we use it first
+        # then add the remainings at the end
+        if macro_table:
+            code = ""
+            for i in range(len(macro_table)):
+                code += "static double opt_table{0}"\
+                        "[BUFFER_SIZE * MAX_NTHREADS][{1}]\n"\
+                        .format(i, len(macro_table[i]))
+                for j in range(len(macro_table[i])):
+                    code += "#define TABLE_{0}(x) "\
+                            "opt_table{1}[(x)][{2}]\n"\
+                            .format(macro_table[i][j].upper(), i, j)
+                    if macro_table[i][j] in params:
+                        params.remove(macro_table[i][j])
         for param in params:
             code += "static double _{0}_table[BUFFER_SIZE * MAX_NTHREADS];\n"\
                     .format(param)
-        # code += "#ifndef KPLUS_WITHOUT_SHARED_CURRENT\n"
-        ions = [[x.r[0].reads[0].name, x.w[0].writes[0].name]
-                for x in children_of_type('UseIon', root)]
-        for ion in reduce(lambda x, y: x+y, ions):
-            code += "static double _{0}_table[BUFFER_SIZE * MAX_NTHREADS];\n"\
-                    .format(ion)
-        # code += "#endif\n"
         return code
 
     def get_num_cvode(self, root):
         return "{0}".format(len(children_of_type('UseIon', root)) * 3)
 
-    def compile(self, filename, root):
+    def compile(self, filename, root, table_order):
         self.filename = filename
-        tokens = self.gen(root)
+        tokens = self.gen(root, table_order)
         tokens.update({"filename": filename}.items())
         return self.jinja_template.render(**tokens)
