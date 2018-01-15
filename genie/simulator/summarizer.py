@@ -53,6 +53,12 @@ class Summarizer:
             dir_path
         )
         self.shell.execute(
+            "cp",
+            ["job{0}.sh.e{1} ../../tmp/".format(job_cnt, job_id)],
+            [],
+            dir_path
+        )
+        self.shell.execute(
             "rm",
             [
                 "job{0}.sh.o{1}".format(job_cnt, job_id),
