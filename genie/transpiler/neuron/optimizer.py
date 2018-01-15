@@ -83,11 +83,11 @@ class Optimizer():
         for token in token_table:
             if macro_table and token in macro_table:
                 code += "{0}double* {1}_table = "\
-                        "&(TABLE_{2}(BUFFER_SIZE * _nth->_id));\n"\
+                        "&(TABLE_{2}(BUFFER_SIZE * _nt->_id));\n"\
                         .format(tab, token, token.upper())
             else:
                 code += "{0}double* {1}_table = "\
-                        "&(_{1}_table[BUFFER_SIZE * _nth->_id]);\n"\
+                        "&(_{1}_table[BUFFER_SIZE * _nt->_id]);\n"\
                         .format(tab, token)
         return code
 

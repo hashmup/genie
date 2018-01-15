@@ -36,7 +36,7 @@ class TaskRunner:
         self.running_jobs = defaultdict(dict)
         self.candidate_jobs = defaultdict(dict)
         self.current_build_param = None
-        self.current_bench = True
+        self.current_bench = False
         self.shell = Shell()
         self.summarizer = Summarizer()
         self.compiler = Compiler()
@@ -69,11 +69,11 @@ class TaskRunner:
         if num > 0:
             self.pending_lock.acquire()
             build_param, job_param, is_bench = self.pending_jobs.pop(0)
+            shouldBuild = self.current_build_param != build_param or\
+                self.current_bench != is_bench
             self.current_build_param = build_param
             self.current_bench = is_bench
             self.pending_lock.release()
-            shouldBuild = self.current_build_param != build_param or\
-                self.current_bench != is_bench
             job_id = self.deploy(shouldBuild,
                                  build_param,
                                  job_param,
@@ -235,7 +235,7 @@ class TaskRunner:
                 self.current_lock.acquire()
                 num = self.current_job_num
                 self.current_lock.release()
-                if num >= self.MAX_NUM_JOBS:
+                if num >= self.MAX_NUM_JOBS or num >= len(self.pending_jobs):
                     break
                 threading.Thread(target=self.deploy_job).start()
                 self.current_lock.acquire()
