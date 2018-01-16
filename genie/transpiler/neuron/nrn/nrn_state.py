@@ -47,7 +47,7 @@ class NrnState():
         code += "\t\tint v_i = _i_table[_iml];\n"\
                 "\t\tFLOAT theta = _theta_table[_iml];\n"
         for param in children_of_type('Global', root)[0].globals:
-            code += "\t\t{0} = TABLE_{1}(v_i);\n"\
+            code += "\t\t_{0} = TABLE_{1}(v_i);\n"\
                     .format(param.name, param.name.upper())
         for state in children_of_type('State', root)[0].state_vars:
             code += "\t\t{0}_table[_iml] += (1.0f - EXP(-local_dt/_{0}tau))"\

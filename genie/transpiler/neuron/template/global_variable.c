@@ -82,8 +82,8 @@ static double _mfac_rates, _tmin_rates;
 #define BUFFER_SIZE 16000
 #define MAX_NTHREADS 8
 #else
-#define BUFFER_SIZE 160000
-#define MAX_NTHREADS 4
+#define BUFFER_SIZE 8000
+#define MAX_NTHREADS 16
 #endif
 
 typedef double FLOAT;

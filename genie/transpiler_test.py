@@ -7,7 +7,7 @@ def main():
     compiler = Compiler()
     analyzer = Analyzer()
     macro_table = analyzer.get_table_candidate(path)
-    # macro_table = None
+    macro_table = None
     compiler.gen(path, macro_table)
 
 

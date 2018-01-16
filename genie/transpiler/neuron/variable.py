@@ -153,8 +153,8 @@ class Variable():
         return code
 
     def get_mechanism(self, root):
-        code = "\t\"{0}\"\n"\
-               "\t\"{1}\"\n"\
+        code = "\t\"{0}\",\n"\
+               "\t\"{1}\",\n"\
                .format(self.version, self.filename)
         for parm in children_of_type('Range', root)[0].ranges:
             code += "\t\"{0}_{1}\",\n"\
