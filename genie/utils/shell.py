@@ -11,12 +11,12 @@ class Shell:
 
     def run_cmds(self, commands):
         for command in commands:
-            print(self.execute(
+            self.execute(
                 command["command"],
                 command["args"],
                 command["options"],
                 command["work_dir"]
-            ))
+            )
 
     def execute(self, command, args, options, work_dir=''):
         """

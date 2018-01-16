@@ -16,7 +16,6 @@ class ConfigParser():
             return None
         if self.config_build_check(config['build']) and \
            self.config_job_check(config['job']):
-            print(config)
             return config
         return None
 
@@ -41,7 +40,6 @@ class ConfigParser():
                 return None
             with open(self.filename) as f:
                 config = json.load(f)
-                print(config)
                 return self.arg_check(config)
         except ValueError as e:
             print('invalid json: {0}'.format(e))

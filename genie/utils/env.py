@@ -38,7 +38,6 @@ class Environment():
 
     def get_env(self):
         os = self.get_os()
-        print(os)
         if os == "k":
             return "k"
         elif os != "unknown":
