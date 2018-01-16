@@ -21,11 +21,14 @@ class Processor():
         config = ConfigParser(path).parse()
         return config['build'], config['job']
 
-    def run_(self, is_bench):
+    def run_(self, is_bench, use_macro):
+        if use_macro and not is_bench:
+            return
         self.taskRunner.push_job(
             self.buildProcessor.cur_params(),
             self.jobProcessor.cur_params(),
-            is_bench
+            is_bench,
+            use_macro
         )
 
     def caller_name(self, skip=2):
@@ -52,13 +55,14 @@ class Processor():
         print("module", inspect.getmodulename(s[1][1]))
         print("dad", self.caller_name())
         for is_bench in [True, False]:
-            self.buildProcessor.init()
-            while self.buildProcessor.has_next():
-                self.buildProcessor.process()
-                self.jobProcessor.init()
-                while self.jobProcessor.has_next():
-                    self.jobProcessor.process()
-                    self.run_(is_bench)
+            for use_macro in [True, False]:
+                self.buildProcessor.init()
+                while self.buildProcessor.has_next():
+                    self.buildProcessor.process()
+                    self.jobProcessor.init()
+                    while self.jobProcessor.has_next():
+                        self.jobProcessor.process()
+                        self.run_(is_bench, use_macro)
         self.taskRunner.run()
 
     def setup(self, neuron_path):

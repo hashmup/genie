@@ -37,6 +37,7 @@ class TaskRunner:
         self.candidate_jobs = defaultdict(dict)
         self.current_build_param = None
         self.current_bench = True
+        self.current_use_macro = True
         self.shell = Shell()
         self.summarizer = Summarizer()
         self.compiler = Compiler()
@@ -58,8 +59,8 @@ class TaskRunner:
         self.cnt = 0
         self.job_total_num = 0
 
-    def push_job(self, build_param, job_param, is_bench):
-        self.pending_jobs.append([build_param, job_param, is_bench])
+    def push_job(self, build_param, job_param, is_bench, use_macro):
+        self.pending_jobs.append([build_param, job_param, is_bench, use_macro])
         self.job_total_num += 1
 
     def deploy_job(self):
@@ -68,31 +69,37 @@ class TaskRunner:
         self.pending_lock.release()
         if num > 0:
             self.pending_lock.acquire()
-            build_param, job_param, is_bench = self.pending_jobs.pop(0)
+            build_param, job_param, is_bench, use_macro = self.pending_jobs.pop(0)
             shouldBuild = self.current_build_param != build_param or\
-                self.current_bench != is_bench
+                self.current_bench != is_bench or\
+                self.current_use_macro != use_macro
             self.current_build_param = build_param
             self.current_bench = is_bench
+            self.current_use_macro = use_macro
             self.pending_lock.release()
             job_id = self.deploy(shouldBuild,
                                  build_param,
                                  job_param,
-                                 is_bench)
+                                 is_bench,
+                                 use_macro)
             self.relation_table_job_cnt[job_id] = self.job_cnt
             if self.first:
                 # record params for future use
                 self.candidate_jobs[job_id]["build_param"] = build_param
                 self.candidate_jobs[job_id]["job_param"] = job_param
                 self.candidate_jobs[job_id]["is_bench"] = is_bench
+                self.candidate_jobs[job_id]["use_macro"] = use_macro
             else:
                 for key in self.candidate_jobs:
                     build = self.candidate_jobs[key]["build_param"]
                     job = self.candidate_jobs[key]["job_param"]
                     bench = self.candidate_jobs[key]["is_bench"]
+                    macro = self.candidate_jobs[key]["use_macro"]
                     if build == build_param\
                         and job == job_param\
-                            and bench == is_bench:
-                                self.relation_table[job_id] = key
+                            and bench == is_bench\
+                                and macro == use_macro:
+                                    self.relation_table[job_id] = key
             self.running_lock.acquire()
             self.running_jobs[job_id] = 0
             # self.running_jobs.append(job_id)
@@ -100,7 +107,7 @@ class TaskRunner:
                 merge_params =\
                     dict(**build_param,
                          **job_param,
-                         **{"job_id": job_id, "bench": is_bench, "time": 0})
+                         **{"job_id": job_id, "bench": is_bench,"macro": use_macro, "time": 0})
                 for key in merge_params.keys():
                     if isinstance(merge_params[key], defaultdict) or\
                             isinstance(merge_params[key], list) or\
@@ -204,7 +211,8 @@ class TaskRunner:
                     build = self.candidate_jobs[job_id]["build_param"]
                     job = self.candidate_jobs[job_id]["job_param"]
                     is_bench = self.candidate_jobs[job_id]["is_bench"]
-                    self.pending_jobs_bak.append([build, job, is_bench])
+                    use_macro = self.candidate_jobs[job_id]["use_macro"]
+                    self.pending_jobs_bak.append([build, job, is_bench, use_macro])
                     self.job_total_num += 1
             elif self.cnt < 2:
                 self.timer_.cancel()
@@ -243,7 +251,7 @@ class TaskRunner:
                 time.sleep(1)
                 self.current_lock.release()
 
-    def deploy(self, shouldBuild, build_params, job_params, is_bench):
+    def deploy(self, shouldBuild, build_params, job_params, is_bench, use_macro):
         _use_tmp = self.use_tmp
         if shouldBuild:
             self.compile_lock.acquire()
@@ -251,7 +259,7 @@ class TaskRunner:
             _use_tmp = self.use_tmp
             path = "neuron_kplus/mod/hh_k.mod"
             macro_table = self.analyzer.get_table_candidate(path)
-            if is_bench:
+            if is_bench or not use_macro:
                 macro_table = None
             self.compiler.gen(path, macro_table)
             self.compile_lock.release()
