@@ -66,13 +66,11 @@ class TaskRunner:
         self.pending_lock.acquire()
         num = len(self.pending_jobs)
         self.pending_lock.release()
-        print(num)
         if num > 0:
             self.pending_lock.acquire()
             build_param, job_param, is_bench = self.pending_jobs.pop(0)
             shouldBuild = self.current_build_param != build_param or\
                 self.current_bench != is_bench
-            print(shouldBuild)
             self.current_build_param = build_param
             self.current_bench = is_bench
             self.pending_lock.release()
@@ -162,10 +160,8 @@ class TaskRunner:
     def watch_job(self):
         print("{0}/{1} {2}".format(self.job_total_num - len(self.pending_jobs),
                                    self.job_total_num, str(datetime.now())))
-        print(self.running_jobs, self.current_job_num, self.pending_jobs)
         self.running_lock.acquire()
         for job_id in self.running_jobs:
-            print(job_id)
             if not self.is_job_still_running(job_id):
                 # print("complete {0}".format(self.running_jobs[i]))
                 self.current_job_num -= 1
@@ -188,6 +184,7 @@ class TaskRunner:
         self.pending_lock.acquire()
         if len(self.pending_jobs) == 0 and len(self.running_jobs) == 0\
                 and self.complete:
+            print(self.cnt)
             print('verifyyyyy')
             if self.verifier.verify():
                 print("Correct!")
@@ -209,7 +206,7 @@ class TaskRunner:
                     is_bench = self.candidate_jobs[job_id]["is_bench"]
                     self.pending_jobs_bak.append([build, job, is_bench])
                     self.job_total_num += 1
-            elif self.cnt < 3:
+            elif self.cnt < 2:
                 self.timer_.cancel()
                 self.cnt += 1
             else:
@@ -220,8 +217,8 @@ class TaskRunner:
                 return
             self.pending_jobs = self.pending_jobs_bak[:]
             self.current_job_num = 0
-            self.run()
             self.pending_lock.release()
+            self.run()
             return
         self.pending_lock.release()
         self.timer_ = threading.Timer(5.0, self.watch_job)
@@ -230,21 +227,17 @@ class TaskRunner:
     def run(self):
         threading.Thread(target=self.watch_job).start()
         while len(self.pending_jobs) != 0:
-            print("run", self.running_jobs, self.pending_jobs)
             self.current_lock.acquire()
             num = self.current_job_num
             self.current_lock.release()
-            print("run num", num)
             if num > self.MAX_NUM_JOBS:
                 time.sleep(15)
             while True:
                 self.current_lock.acquire()
                 num = self.current_job_num
-                print("aaaa", num, self.running_jobs, self.pending_jobs)
                 if num >= self.MAX_NUM_JOBS or num >= self.job_total_num:
                     self.current_lock.release()
                     break
-                print("aaaa", num, self.running_jobs, self.pending_jobs)
                 threading.Thread(target=self.deploy_job).start()
                 self.current_job_num += 1
                 time.sleep(1)
