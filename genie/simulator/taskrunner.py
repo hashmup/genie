@@ -278,9 +278,12 @@ class TaskRunner:
                                      is_bench,
                                      build_params,
                                      _use_tmp)
-            self.compile_lock.release()
+        else:
+            self.compile_lock.acquire()
         self.job_cnt += 1
-        return self.deployCommand.run(self.environment,
-                                      job_params,
-                                      self.job_cnt,
-                                      _use_tmp)
+        job_id = self.deployCommand.run(self.environment,
+                                        job_params,
+                                        self.job_cnt,
+                                        _use_tmp)
+        self.compile_lock.release()
+        return job_id
