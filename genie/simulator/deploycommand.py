@@ -1,4 +1,5 @@
 import re
+import threading
 from utils.shell import Shell
 from utils.env import Environment
 from simulator.buildgenerator import BuildGenerator
@@ -19,6 +20,7 @@ class DeployCommand():
         self.job_generator = JobGenerator(job_name)
 
     def build(self, env, bench, params, use_tmp):
+        print(threading.current_thread, use_tmp)
         self.build_generator.gen(params, use_tmp, env)
         commands = []
         tmp_str = ".tmp" if use_tmp else ""
@@ -117,6 +119,7 @@ class DeployCommand():
         self.shell.run_cmds(commands)
 
     def run(self, env, params, cnt, use_tmp):
+        print(threading.current_thread, use_tmp)
         self.job_generator.gen(params, cnt, use_tmp)
         if env == "cluster":
             res = self.shell.execute(

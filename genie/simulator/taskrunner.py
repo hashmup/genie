@@ -244,9 +244,11 @@ class TaskRunner:
                 self.current_lock.release()
 
     def deploy(self, shouldBuild, build_params, job_params, is_bench):
+        _use_tmp = self.use_tmp
         if shouldBuild:
             self.compile_lock.acquire()
             self.use_tmp = not self.use_tmp
+            _use_tmp = self.use_tmp
             path = "neuron_kplus/mod/hh_k.mod"
             macro_table = self.analyzer.get_table_candidate(path)
             if is_bench:
@@ -256,9 +258,9 @@ class TaskRunner:
             self.deployCommand.build(self.environment,
                                      is_bench,
                                      build_params,
-                                     self.use_tmp)
+                                     _use_tmp)
         self.job_cnt += 1
         return self.deployCommand.run(self.environment,
                                       job_params,
                                       self.job_cnt,
-                                      self.use_tmp)
+                                      _use_tmp)
