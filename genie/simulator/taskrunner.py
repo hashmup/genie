@@ -71,6 +71,7 @@ class TaskRunner:
             build_param, job_param, is_bench = self.pending_jobs.pop(0)
             shouldBuild = self.current_build_param != build_param or\
                 self.current_bench != is_bench
+            print(shouldBuild)
             self.current_build_param = build_param
             self.current_bench = is_bench
             self.pending_lock.release()

@@ -103,8 +103,18 @@ class Variable():
         code = ""
         for assigned in children_of_type('Assigned', root)[0].assigneds:
             if assigned.unit:
+                unit = assigned.unit
+                unit = unit.replace('(', '')
+                unit = unit.replace(')', '')
                 code += "\t\"{0}_{1}\", \"{2}\",\n"\
-                    .format(assigned.name, self.filename, assigned.unit)
+                    .format(assigned.name, self.filename, unit)
+        for param in children_of_type('Parameter', root)[0].parameters:
+            if param.unit:
+                unit = param.unit
+                unit = unit.replace('(', '')
+                unit = unit.replace(')', '')
+                code += "\t\"{0}_{1}\", \"{2}\",\n"\
+                        .format(param.name, self.filename, unit)
         code += "\t0,0"
         return code
 

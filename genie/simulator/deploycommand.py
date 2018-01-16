@@ -138,7 +138,5 @@ class DeployCommand():
             )
             if type(res[0]) is bytes:
                 res1 = res[0].decode('utf-8')
-            print(res1)
-            print(res)
             m = id_k_exp.match(res1)
             return m.group("id")
