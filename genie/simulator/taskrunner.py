@@ -242,6 +242,7 @@ class TaskRunner:
                 num = self.current_job_num
                 print("aaaa", num, self.running_jobs, self.pending_jobs)
                 if num >= self.MAX_NUM_JOBS or num >= self.job_total_num:
+                    self.current_lock.release()
                     break
                 print("aaaa", num, self.running_jobs, self.pending_jobs)
                 threading.Thread(target=self.deploy_job).start()
