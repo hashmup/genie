@@ -106,7 +106,10 @@ class BuildProcessor():
             return ret
         params = rangestr.split(',')
         if len(params) > 1:
-            params = [int(x.replace(' ', '')) for x in params]
+            params = [x.replace(' ', '') for x in params]
+            for i in range(len(params)):
+                if params[i].isdigit():
+                    params[i] = int(params[i])
             if len(params) == 2:
                 return [x for x in range(params[0], params[1]+1)]
             if len(params) == 3:
