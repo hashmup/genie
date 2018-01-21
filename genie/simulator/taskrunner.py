@@ -210,7 +210,8 @@ class TaskRunner:
                 index = math.ceil(len(self.result_table)/4.0)
                 sorted_table = self.result_table.sort_values(by="time")\
                     .reset_index(drop=True)[:index]
-                sorted_table = sorted_table.sort_values(by=["bench", "macro"])
+                sorted_table = sorted_table.sort_values(by=["bench", "macro"])\
+                    .reset_index(drop=True)
                 self.job_total_num = 0
                 self.result_table = sorted_table
                 for i in range(len(sorted_table)):
@@ -228,7 +229,7 @@ class TaskRunner:
                 self.timer_.cancel()
                 self.cnt += 1
             else:
-                self.result_table['avg_time'] = self.result_table['time'] / 2.0
+                self.result_table['avg_time'] = self.result_table['time'] / 3.0
                 self.result_table.to_csv("result_candidate.csv")
                 self.timer_.cancel()
                 self.pending_lock.release()
