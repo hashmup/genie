@@ -3,6 +3,7 @@
 from argparse import ArgumentParser
 from os.path import join, dirname, abspath
 from genie.genie import Genie
+from utils.shell import Shell
 
 
 ROOT = abspath(dirname(__file__))

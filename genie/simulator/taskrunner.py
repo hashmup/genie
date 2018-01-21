@@ -1,6 +1,7 @@
 import re
 import time
 import math
+import os
 from utils.shell import Shell
 from simulator.summarizer import Summarizer
 from simulator.verifier import Verifier
@@ -52,6 +53,7 @@ class TaskRunner:
         self.relation_table = defaultdict(dict)
         self.relation_table_job_cnt = defaultdict(dict)
         self.deployCommand = DeployCommand(neuron_path)
+        self.neuron_path = neuron_path
         self.job_cnt = 0
         self.use_tmp = True  # We use both original and tmp
         self.complete = False
@@ -169,7 +171,7 @@ class TaskRunner:
                 return True
 
     def watch_job(self):
-        print("{0}/{1} {2}".format(self.job_total_num - len(self.pending_jobs),
+        print("{0}: {1}/{2} {3}".format(self.cnt, self.job_total_num - len(self.pending_jobs),
                                    self.job_total_num, str(datetime.now())))
         self.running_lock.acquire()
         for job_id in self.running_jobs:
@@ -208,8 +210,9 @@ class TaskRunner:
                 index = math.ceil(len(self.result_table)/4.0)
                 sorted_table = self.result_table.sort_values(by="time")\
                     .reset_index(drop=True)[:index]
+                sorted_table = sorted_table.sort_values(by=["bench", "macro"])
                 self.job_total_num = 0
-                self.result_table = sorted_table.sort_values(by="bench")
+                self.result_table = sorted_table
                 for i in range(len(sorted_table)):
                     job_id = sorted_table['job_id'][i]
                     build = self.candidate_jobs[job_id]["build_param"]
@@ -221,14 +224,15 @@ class TaskRunner:
                                                   is_bench,
                                                   use_macro])
                     self.job_total_num += 1
-            elif self.cnt < 2:
+            elif self.cnt < 1:
                 self.timer_.cancel()
                 self.cnt += 1
             else:
-                self.result_table['avg_time'] = self.result_table['time'] / 4.0
+                self.result_table['avg_time'] = self.result_table['time'] / 2.0
                 self.result_table.to_csv("result_candidate.csv")
                 self.timer_.cancel()
                 self.pending_lock.release()
+                self.cleanup()
                 return
             self.pending_jobs = self.pending_jobs_bak[:]
             self.current_job_num = 0
@@ -255,7 +259,7 @@ class TaskRunner:
                     break
                 threading.Thread(target=self.deploy_job).start()
                 self.current_job_num += 1
-                time.sleep(1)
+                time.sleep(3)
                 self.current_lock.release()
 
     def deploy(self,
@@ -287,3 +291,26 @@ class TaskRunner:
                                         _use_tmp)
         self.compile_lock.release()
         return job_id
+
+    def cleanup(self):
+        root = os.path.join(self.neuron_path, "../")
+        dir_path = os.path.join(os.path.join(root, "data"), datetime.now().strftime('%Y-%m-%d_%H-%M'))
+        os.makedirs(dir_path)
+        self.shell.execute(
+            "mv",
+            ["tmp", dir_path],
+            [],
+            root
+        )
+        self.shell.execute(
+            "mv",
+            ["result_all.csv", dir_path],
+            [],
+            root
+        )
+        self.shell.execute(
+            "mv",
+            ["result_candidate.csv", dir_path],
+            [],
+            root
+        )

@@ -22,7 +22,7 @@ class Processor():
         return config['build'], config['job']
 
     def run_(self, is_bench, use_macro):
-        if use_macro and not is_bench:
+        if use_macro and is_bench:
             return
         self.taskRunner.push_job(
             self.buildProcessor.cur_params(),

@@ -24,6 +24,7 @@ class Verifier():
         files = [f for f in listdir(dir_path) if isfile(join(dir_path, f))]
         for filename in files:
             f = open(join(dir_path, filename))
+            print(filename)
             lines = f.readlines()
             f.close()
             s.add(self.sort_and_hash_log(lines))

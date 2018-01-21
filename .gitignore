@@ -9,3 +9,4 @@ result.csv
 *.swp
 tests/.ipynb_checkpoints/
 analyze/.ipynb_checkpoints/
+data/

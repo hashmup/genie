@@ -56,7 +56,7 @@
             "omp_num_threads": "2,16,2",
             "nrniv": "../specials/x86_64/special -mpi",
             "hoc_name": "../hoc/bench_main.hoc",
-            "stop_time": 50,
+            "stop_time": 200,
             "nthread": 16,
             "prof": ""
         },
