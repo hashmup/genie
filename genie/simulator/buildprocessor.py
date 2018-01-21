@@ -107,11 +107,17 @@ class BuildProcessor():
         params = rangestr.split(',')
         if len(params) > 1:
             params = [x.replace(' ', '') for x in params]
+            isDigit = True
             for i in range(len(params)):
                 if params[i].isdigit():
                     params[i] = int(params[i])
-            if len(params) == 2:
-                return [x for x in range(params[0], params[1]+1)]
-            if len(params) == 3:
-                return [x for x in range(params[0], params[1]+1, params[2])]
+                else:
+                    isDigit = False
+            if isDigit:
+                if len(params) == 2:
+                    return [x for x in range(params[0], params[1]+1)]
+                if len(params) == 3:
+                    return [x for x in range(params[0], params[1]+1, params[2])]
+            else:
+                return params
         return [rangestr]
