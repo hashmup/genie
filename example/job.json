@@ -20,8 +20,7 @@
               "use_pthread":"no",
               "CFLAGS":"\"-O3 -fopenmp -DKPLUS -DKPLUS_GATHER_SCATTER -DKPLUS_SPAWN -DCLUSTER_USE_OMP\"",
               "CXXFLAGS":"\"-O3 -fopenmp -DKPLUS -DKPLUS_GATHER_SCATTER -DKPLUS_SPAWN -DCLUSTER_USE_OMP\"",
-              "CC":"gcc, mpiicc",
-              "CXX":"g++, mpiicpc"
+              "CC":"mpicc, mpiicc"
             }
         },
         "build_config_k": {

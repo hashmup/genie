@@ -55,6 +55,12 @@ class BuildProcessor():
                     params[k] = self.build_table[k]
                 else:
                     params[k] = self.build_table[k][self.index_table[k]]
+        if params["compile_options"]["CC"] == "mpicc":
+            params["compile_options"]["CXX"] = "mpicpc"
+        else:
+            params["compile_options"]["CXX"] = "mpiicpc"
+        params["compile_options"]["MPICC"] = params["CC"]
+        params["compile_options"]["MPICXX"] = params["CXX"]
         return params
 
     def carry_by_one(self, carry_index):
