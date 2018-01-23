@@ -122,7 +122,10 @@ class TaskRunner:
                             self.result_table.loc[-1, key] = 0
                         self.result_table[key] =\
                             self.result_table[key].astype('object')
-                        self.result_table.set_value(-1, key, merge_params[key])
+                        if isinstance(merge_params[key], defaultdict) or isinstance(merge_params[key], dict):
+                            self.result_table.set_value(-1, key, frozenset(merge_params[key].items()))
+                        else:
+                            self.result_table.set_value(-1, key, frozenset(merge_params[key]))
                     else:
                         self.result_table.loc[-1, key] = merge_params[key]
                 self.result_table.index = self.result_table.index + 1
@@ -207,10 +210,10 @@ class TaskRunner:
                 self.result_table.to_csv("result_all.csv")
                 self.timer_.cancel()
                 self.first = False
-                index = math.ceil(len(self.result_table)/4.0)
+                index = math.ceil(len(self.result_table)/16.0)
                 sorted_table = self.result_table.sort_values(by="time")\
                     .reset_index(drop=True)[:index]
-                sorted_table = sorted_table.sort_values(by=["bench", "macro"])\
+                sorted_table = sorted_table.sort_values(by=["bench", "macro", "compile_options"])\
                     .reset_index(drop=True)
                 self.job_total_num = 0
                 self.result_table = sorted_table
