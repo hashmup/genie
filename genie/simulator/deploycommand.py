@@ -50,7 +50,7 @@ class DeployCommand():
             },
                 {
                 "command": "./make_special.sh",
-                "args": ["x86_64", bench],
+                "args": ["x86_64", bench, tmp_str],
                 "options": [],
                 "work_dir": "{0}/specials{1}".format(self.neuron_path, tmp_str)
             }]
@@ -112,7 +112,7 @@ class DeployCommand():
                 {
                 "command": "./make_special.sh",
                 "args": [],
-                "options": ["x86_64", bench],
+                "options": ["sparc64", bench, tmp_str],
                 "work_dir": "{0}/specials{1}".format(self.neuron_path, tmp_str)
             }]
         self.shell.run_cmds(commands)
