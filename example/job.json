@@ -20,7 +20,7 @@
               "use_pthread":"no",
               "CFLAGS":"\"-O3 -fopenmp -DKPLUS -DKPLUS_GATHER_SCATTER -DKPLUS_SPAWN -DCLUSTER_USE_OMP\"",
               "CXXFLAGS":"\"-O3 -fopenmp -DKPLUS -DKPLUS_GATHER_SCATTER -DKPLUS_SPAWN -DCLUSTER_USE_OMP\"",
-              "CC":"mpicc, mpiicc"
+              "CC":"mpicc"
             }
         },
         "build_config_k": {
@@ -51,13 +51,13 @@
     "job" : {
         "job_cluster": {
             "nodes":"1",
-            "ppn":"2,28,2",
+            "ppn":"23,28,1",
             "modules": [
             ],
-            "omp_num_threads": "2, 16, 2",
+            "omp_num_threads": "[1, 2, 3, 4, 5, 6, 7, 8, 9,  11, 13, 14, 16]",
             "nrniv": "../specials/x86_64/special -mpi",
             "hoc_name": "../hoc/bench_main.hoc",
-            "stop_time": 50,
+            "stop_time": 250,
             "nthread": 16,
             "prof": ""
         },

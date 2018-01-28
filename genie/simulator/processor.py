@@ -54,7 +54,7 @@ class Processor():
         print("me", inspect.stack()[1][3])
         print("module", inspect.getmodulename(s[1][1]))
         print("dad", self.caller_name())
-        for is_bench in [True, False]:
+        for is_bench in [False]:
             for use_macro in [True, False]:
                 self.buildProcessor.init()
                 while self.buildProcessor.has_next():
