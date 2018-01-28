@@ -75,6 +75,12 @@ class JobProcessor():
             return rangestr
         if type(rangestr) is int:
             return [rangestr]
+        if len(rangestr) > 0 and rangestr[0] == '[' and rangestr[len(rangestr) - 1] == ']':
+            params = rangestr[1:len(rangestr)-1].split(',')
+            if len(params) > 1:
+                params = [int(x.replace(' ', '')) for x in params]
+                print(params)
+                return params
         params = rangestr.split(',')
         if len(params) > 1:
             params = [int(x.replace(' ', '')) for x in params]

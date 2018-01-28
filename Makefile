@@ -38,7 +38,7 @@ test: clean
 compile:
 	python genie/transpiler_test.py
 
-push: clean
+push:
 	git add -A
 	git commit
 	git push origin master

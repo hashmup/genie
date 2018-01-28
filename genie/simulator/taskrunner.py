@@ -2,6 +2,7 @@ import re
 import time
 import math
 import os
+import random
 from utils.shell import Shell
 from simulator.summarizer import Summarizer
 from simulator.verifier import Verifier
@@ -180,20 +181,21 @@ class TaskRunner:
         for job_id in self.running_jobs:
             if not self.is_job_still_running(job_id):
                 # print("complete {0}".format(self.running_jobs[i]))
-                self.current_job_num -= 1
                 job_cnt = self.relation_table_job_cnt[job_id]
-                time = self.summarizer.summary(job_id, job_cnt)
+                calc_time = self.summarizer.summary(job_id, job_cnt)
                 if self.first:
                     key = self.result_table['job_id'] == job_id
                 else:
                     key = self.result_table['job_id'] ==\
                           self.relation_table[job_id]
                 if self.first:
-                    self.result_table.loc[key, 'time'] = time
+                    self.result_table.loc[key, 'time'] = calc_time
                 else:
-                    self.result_table.loc[key, 'time'] += time
+                    self.result_table.loc[key, 'time{0}'.format(self.cnt)] = calc_time
+                    #self.result_table.loc[key, 'time'] += calc_time
                 self.complete = True
                 del self.running_jobs[job_id]
+                self.current_job_num -= 1
                 break
         self.running_lock.release()
 
@@ -210,7 +212,7 @@ class TaskRunner:
                 self.result_table.to_csv("result_all.csv")
                 self.timer_.cancel()
                 self.first = False
-                index = math.ceil(len(self.result_table)/16.0)
+                index = math.ceil(len(self.result_table)/1.0)
                 sorted_table = self.result_table.sort_values(by="time")\
                     .reset_index(drop=True)[:index]
                 sorted_table = sorted_table.sort_values(by=["bench", "macro", "compile_options"])\
@@ -228,11 +230,11 @@ class TaskRunner:
                                                   is_bench,
                                                   use_macro])
                     self.job_total_num += 1
-            elif self.cnt < 1:
+            elif self.cnt < 4:
                 self.timer_.cancel()
                 self.cnt += 1
             else:
-                self.result_table['avg_time'] = self.result_table['time'] / 3.0
+                #self.result_table['avg_time'] = self.result_table['time'] / 3.0
                 self.result_table.to_csv("result_candidate.csv")
                 self.timer_.cancel()
                 self.pending_lock.release()
@@ -262,8 +264,8 @@ class TaskRunner:
                     self.current_lock.release()
                     break
                 threading.Thread(target=self.deploy_job).start()
+                #self.deploy_job()
                 self.current_job_num += 1
-                time.sleep(3)
                 self.current_lock.release()
 
     def deploy(self,
