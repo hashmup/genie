@@ -62,14 +62,14 @@
             "prof": ""
         },
         "job_k": {
-            "nodes":"2,8,2",
+            "nodes":"8",
             "ppn":"1,8,1",
             "modules": [
             ],
-            "omp_num_threads": "2,16,2",
+            "omp_num_threads": "1,16,1",
             "nrniv": "./special -mpi",
             "hoc_name": "./bench_main.hoc",
-            "stop_time": 200,
+            "stop_time": 100,
             "nthread": 16,
             "prof": ""
         }

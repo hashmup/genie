@@ -210,7 +210,6 @@ class TaskRunner:
                 print("Incorrect :(")
             if self.first:
                 self.result_table.to_csv("result_all.csv")
-                self.timer_.cancel()
                 self.first = False
                 index = math.ceil(len(self.result_table)/1.0)
                 sorted_table = self.result_table.sort_values(by="time")\
@@ -231,12 +230,10 @@ class TaskRunner:
                                                   use_macro])
                     self.job_total_num += 1
             elif self.cnt < 4:
-                self.timer_.cancel()
                 self.cnt += 1
             else:
                 #self.result_table['avg_time'] = self.result_table['time'] / 3.0
                 self.result_table.to_csv("result_candidate.csv")
-                self.timer_.cancel()
                 self.pending_lock.release()
                 self.cleanup()
                 return
@@ -246,8 +243,7 @@ class TaskRunner:
             self.run()
             return
         self.pending_lock.release()
-        self.timer_ = threading.Timer(5.0, self.watch_job)
-        self.timer_.start()
+        time.sleep(10)
 
     def run(self):
         threading.Thread(target=self.watch_job).start()
@@ -264,8 +260,8 @@ class TaskRunner:
                     self.current_lock.release()
                     break
                 threading.Thread(target=self.deploy_job).start()
-                #self.deploy_job()
                 self.current_job_num += 1
+                time.sleep(3)
                 self.current_lock.release()
 
     def deploy(self,
