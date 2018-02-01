@@ -41,7 +41,7 @@ class Summarizer:
             m = time_exp.match(line)
             if m:
                 calc_time = int(m.group("decimal")) +\
-                    int(m.group("float")) * 10**(-len(m.group("float"))+1)
+                    int(m.group("float")) * 10**(-len(m.group("float")))
                 print(calc_time)
                 return calc_time
 

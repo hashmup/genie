@@ -1,0 +1,379 @@
+
+    digraph xtext {
+    fontname = "Bitstream Vera Sans"
+    fontsize = 8
+    node[
+        shape=record,
+        style=filled,
+        fillcolor=aliceblue
+    ]
+    nodesep = 0.3
+    edge[dir=black,arrowtail=empty]
+
+
+140728938147432 -> 140728938150792[arrowtail=diamond, dir=both, headlabel="blocks 0..*"]
+140728938147432[ label="{Program|}"]
+
+140728938150792[ label="{*NModlBlock|}"]
+140728938150792 -> 140728937988024 [dir=back]
+140728938150792 -> 140728938789496 [dir=back]
+140728938150792 -> 140728938001816 [dir=back]
+140728938150792 -> 140728938785784 [dir=back]
+140728938150792 -> 140728938021368 [dir=back]
+140728938150792 -> 140728936427384 [dir=back]
+140728938150792 -> 140728936471096 [dir=back]
+140728938150792 -> 140728938020440 [dir=back]
+140728938150792 -> 140728938821048 [dir=back]
+140728938150792 -> 140728938028792 [dir=back]
+140728938150792 -> 140728936500280 [dir=back]
+140728938150792 -> 140728936486616 [dir=back]
+140728938150792 -> 140728938808056 [dir=back]
+140728938150792 -> 140728939392392 [dir=back]
+140728938150792 -> 140728938094664 [dir=back]
+140728938150792 -> 140728936449976 [dir=back]
+140728938150792 -> 140728938122984 [dir=back]
+
+140728937764696[ label="{ID|}"]
+
+140728937768056[ label="{STRING|}"]
+
+140728937771416[ label="{BOOL|}"]
+
+140728937774776[ label="{INT|}"]
+
+140728937778136[ label="{FLOAT|}"]
+
+140728937781496[ label="{NUMBER|}"]
+140728937781496 -> 140728937778136 [dir=back]
+140728937781496 -> 140728937774776 [dir=back]
+
+140728937784856[ label="{BASETYPE|}"]
+140728937784856 -> 140728937781496 [dir=back]
+140728937784856 -> 140728937771416 [dir=back]
+140728937784856 -> 140728937764696 [dir=back]
+140728937784856 -> 140728937768056 [dir=back]
+
+140728937788792[ label="{*OBJECT|}"]
+140728937788792 -> 140728937784856 [dir=back]
+
+140728937979848[ label="{Comment|COMMENT[\\s\\S]*\?ENDCOMMENT\|[:\?].*}"]
+
+140728937982632[ label="{PrintF|printf \\(\\\".*\\\"(,.*)*\\)}"]
+
+140728937988024[ label="{Title|+title:STRING\l}"]
+
+140728938785784 -> 140728938797848[arrowtail=diamond, dir=both, headlabel="statements 0..*"]
+140728938785784[ label="{Neuron|}"]
+
+140728938797848[ label="{*NRNStat|}"]
+140728938797848 -> 140728938792280 [dir=back]
+140728938797848 -> 140728936426456 [dir=back]
+140728938797848 -> 140728936436888 [dir=back]
+140728938797848 -> 140728938800632 [dir=back]
+140728938797848 -> 140728938803416 [dir=back]
+140728938797848 -> 140728936440824 [dir=back]
+140728938797848 -> 140728936444184 [dir=back]
+140728938797848 -> 140728936447544 [dir=back]
+
+140728936426456[ label="{Suffix|+suffix:ID\l}"]
+
+140728936436888 -> 140728938023224[headlabel="globals 1..*"]
+140728936436888[ label="{Global|}"]
+
+140728938800632 -> 140728938023224[headlabel="ranges 1..*"]
+140728938800632[ label="{Range|}"]
+
+140728938803416[ label="{Pointer|+pointers:list[ID]\l}"]
+
+140728936440824[ label="{External|+externals:list[ID]\l}"]
+
+140728936444184[ label="{Nonspecific|+nonspecifics:list[ID]\l}"]
+
+140728936447544 -> 140728938806200[arrowtail=diamond, dir=both, headlabel="r 0..*"]
+140728936447544 -> 140728938808984[arrowtail=diamond, dir=both, headlabel="w 0..*"]
+140728936447544 -> 140728938811768[arrowtail=diamond, dir=both, headlabel="v 0..*"]
+140728936447544[ label="{UseIon|+ion:ID\l}"]
+
+140728938806200 -> 140728938023224[headlabel="reads 1..*"]
+140728938806200[ label="{Read|}"]
+
+140728938808984 -> 140728938023224[headlabel="writes 1..*"]
+140728938808984[ label="{Write|}"]
+
+140728938811768[ label="{Valence|+valence:INT\l}"]
+
+140728938028792 -> 140728938783928[arrowtail=diamond, dir=both, headlabel="state_vars 0..*"]
+140728938028792[ label="{State|}"]
+
+140728938783928[ label="{StateVariable|+name:ID\l+len:INT\l+unit:UnitId\l+llim:FLOAT\l+ulim:FLOAT\l}"]
+
+140728938021368 -> 140728938024152[arrowtail=diamond, dir=both, headlabel="parameters 0..*"]
+140728938021368[ label="{Parameter|}"]
+
+140728938024152[ label="{ParDef|+name:ID\l+value:NUMBER\l+unit:UnitId\l+llim:NUMBER\l+ulim:NUMBER\l}"]
+
+140728938026936[ label="{NUMBER|}"]
+
+140728936427384 -> 140728936430168[arrowtail=diamond, dir=both, headlabel="constants 0..*"]
+140728936427384[ label="{Constant|}"]
+
+140728936430168[ label="{ConstDef|+name:ID\l+value:NUMBER\l+unit:UnitId\l}"]
+
+140728936432952[ label="{NUMBER|}"]
+
+140728938001816 -> 140728938004600[arrowtail=diamond, dir=both, headlabel="unit_defs 0..*"]
+140728938001816[ label="{Units|}"]
+
+140728938004600[ label="{UnitDef|+name:UnitName\l+const:NUMBER\l+base_units:list[BaseUnit]\l}"]
+
+140728938007384[ label="{UnitName|ID}"]
+
+140728938010168[ label="{BaseUnit|\\([ _a-zA-Z0-9.^*\\/-]*\\) }"]
+
+140728938012952[ label="{UnitId|\\([ _a-zA-Z0-9.^*\\/-]*\\)}"]
+
+140728938015736[ label="{NUMBER|}"]
+
+140728938020440 -> 140728938009240[arrowtail=diamond, dir=both, headlabel="assigneds 0..*"]
+140728938020440[ label="{Assigned|}"]
+
+140728938009240[ label="{AssignedDef|+name:ID\l+len:INT\l+unit:UnitId\l}"]
+
+140728939392392 -> 140728936449048[arrowtail=diamond, dir=both, headlabel="b "]
+140728939392392[ label="{Derivative|+name:ID\l}"]
+
+140728936486616 -> 140728938796920[arrowtail=diamond, dir=both, headlabel="b "]
+140728936486616[ label="{Breakpoint|}"]
+
+140728936464568[ label="{*Statement|}"]
+140728936464568 -> 140728938789496 [dir=back]
+140728936464568 -> 140728936449976 [dir=back]
+140728936464568 -> 140728936455416 [dir=back]
+140728936464568 -> 140728938094664 [dir=back]
+140728936464568 -> 140728936449048 [dir=back]
+140728936464568 -> 140728938061064 [dir=back]
+140728936464568 -> 140728936487544 [dir=back]
+140728936464568 -> 140728936490904 [dir=back]
+140728936464568 -> 140728938054344 [dir=back]
+140728936464568 -> 140728938063144 [dir=back]
+
+140728936449048 -> 140728936464568[arrowtail=diamond, dir=both, headlabel="stmts 0..*"]
+140728936449048[ label="{Block|}"]
+
+140728936487544 -> 140728938050632[arrowtail=diamond, dir=both, headlabel="cond "]
+140728936487544 -> 140728936449048[arrowtail=diamond, dir=both, headlabel="true_blk "]
+140728936487544 -> 140728938050632[arrowtail=diamond, dir=both, headlabel="elif_cond 0..*"]
+140728936487544 -> 140728936449048[arrowtail=diamond, dir=both, headlabel="elif_blk 0..*"]
+140728936487544 -> 140728936449048[arrowtail=diamond, dir=both, headlabel="false_blk "]
+140728936487544[ label="{IfStatement|}"]
+
+140728936490904 -> 140728938050632[arrowtail=diamond, dir=both, headlabel="cond "]
+140728936490904 -> 140728936449048[arrowtail=diamond, dir=both, headlabel="b "]
+140728936490904[ label="{WhileStatement|}"]
+
+140728938043208[ label="{IF|if\|IF}"]
+
+140728938045992[ label="{WHILE|while\|WHILE}"]
+
+140728938048776[ label="{ELSE|else\|ELSE}"]
+
+140728938051560[ label="{ELSEIF|else if\|ELSE IF}"]
+
+140728938054344 -> 140728938057704[arrowtail=diamond, dir=both, headlabel="counter "]
+140728938054344 -> 140728938050632[arrowtail=diamond, dir=both, headlabel="from "]
+140728938054344 -> 140728938050632[arrowtail=diamond, dir=both, headlabel="to "]
+140728938054344 -> 140728936449048[arrowtail=diamond, dir=both, headlabel="b "]
+140728938054344[ label="{FromStatement|}"]
+
+140728938057704[ label="{FromCounter|+name:ID\l}"]
+
+140728938061064 -> 140728938066504[arrowtail=diamond, dir=both, headlabel="expression "]
+140728938061064[ label="{Primed|+variable:ID\l}"]
+
+140728938050632[ label="{*Expression|}"]
+140728938050632 -> 140728938063144 [dir=back]
+
+140728938063144 -> 140728938082728[arrowtail=diamond, dir=both, headlabel="variable "]
+140728938063144 -> 140728938066504[arrowtail=diamond, dir=both, headlabel="expression "]
+140728938063144[ label="{Assignment|}"]
+
+140728938066504[ label="{LogicalCon|op:list[OBJECT]\l}"]
+
+140728938069864[ label="{Relational|op:list[OBJECT]\l}"]
+
+140728936454488[ label="{Addition|op:list[OBJECT]\l}"]
+
+140728936493336[ label="{Multiplication|op:list[OBJECT]\l}"]
+
+140728936496696[ label="{Exponentiation|+op:list[OBJECT]\l}"]
+
+140728938072648 -> 140728938098024[arrowtail=diamond, dir=both, headlabel="sign "]
+140728938072648 -> 140728938076008[arrowtail=diamond, dir=both, headlabel="primary "]
+140728938072648[ label="{Negation|}"]
+
+140728938076008[ label="{*Primary|}"]
+140728938076008 -> 140728938018584 [dir=back]
+140728938076008 -> 140728938087944 [dir=back]
+140728938076008 -> 140728938086088 [dir=back]
+140728938076008 -> 140728938082728 [dir=back]
+
+140728938079368[ label="{*Var|}"]
+140728938079368 -> 140728936439896 [dir=back]
+140728938079368 -> 140728938091304 [dir=back]
+140728938079368 -> 140728938023224 [dir=back]
+140728938079368 -> 140728938094664 [dir=back]
+140728938079368 -> 140728938057704 [dir=back]
+
+140728938082728 -> 140728938079368[headlabel="var "]
+140728938082728 -> 140728938050632[arrowtail=diamond, dir=both, headlabel="idx "]
+140728938082728[ label="{VarRef|}"]
+
+140728938086088[ label="{Num|+num:NUMBER\l+unit:UnitId\l}"]
+
+140728938078440[ label="{*Func|}"]
+140728938078440 -> 140728938094664 [dir=back]
+140728938078440 -> 140728936471096 [dir=back]
+
+140728938065576 -> 140728938078440[headlabel="user "]
+140728938065576[ label="{Callable|+builtin:Builtin\l}"]
+
+140728938018584 -> 140728938065576[arrowtail=diamond, dir=both, headlabel="func "]
+140728938018584 -> 140728938050632[arrowtail=diamond, dir=both, headlabel="args 0..*"]
+140728938018584[ label="{FuncCall|}"]
+
+140728938087944 -> 140728938050632[arrowtail=diamond, dir=both, headlabel="ex "]
+140728938087944[ label="{Paren|}"]
+
+140728938091304[ label="{FuncPar|+name:ID\l+unit:UnitId\l}"]
+
+140728938094664 -> 140728938091304[arrowtail=diamond, dir=both, headlabel="pars 0..*"]
+140728938094664 -> 140728936449048[arrowtail=diamond, dir=both, headlabel="b "]
+140728938094664[ label="{FuncDef|is_function:BOOL\lis_procedure:BOOL\l+name:ID\l+unit:UnitId\l}"]
+
+140728938098024[ label="{PlusOrMinus|+o:STRING\l}"]
+
+140728938101960[ label="{MulOrDiv|+o:STRING\l}"]
+
+140728938105896[ label="{Exp|+o:STRING\l}"]
+
+140728938109256[ label="{RelOp|+o:STRING\l}"]
+
+140728938114152[ label="{LogCon|+o:STRING\l}"]
+
+140728938119048[ label="{NUMBER|}"]
+
+140728936500280 -> 140728938796920[arrowtail=diamond, dir=both, headlabel="b "]
+140728936500280[ label="{Initial|}"]
+
+140728938786712[ label="{*Keyword|if\|else\|while\|FUNCTION\|LOCAL\|SOLVE\|TABLE\|DEPEND}"]
+140728938786712 -> 140728938792280 [dir=back]
+140728938786712 -> 140728938789496 [dir=back]
+
+140728938789496[ label="{UnitsCtrl|+units_on:STRING\l+units_off:STRING\l}"]
+
+140728938792280[ label="{Threadsafe|+t:STRING\l}"]
+
+140728938795064[ label="{Builtin|sin\|cos\|tan\|exp\|log\|abs\|fabs\|normrand\|floor\|scop_random\|sqrt\|ceil\|set_seed\|pow }"]
+
+140728936455416 -> 140728936476888[arrowtail=diamond, dir=both, headlabel="tabbed 0..*"]
+140728936455416 -> 140728936458776[arrowtail=diamond, dir=both, headlabel="depend "]
+140728936455416 -> 140728936462136[arrowtail=diamond, dir=both, headlabel="f "]
+140728936455416 -> 140728936465496[arrowtail=diamond, dir=both, headlabel="t "]
+140728936455416 -> 140728936468856[arrowtail=diamond, dir=both, headlabel="w "]
+140728936455416[ label="{Table|}"]
+
+140728936458776 -> 140728936476888[arrowtail=diamond, dir=both, headlabel="deps 0..*"]
+140728936458776[ label="{Depends|}"]
+
+140728936462136[ label="{From|+val:FloatOrVar\l}"]
+
+140728936465496[ label="{To|+val:FloatOrVar\l}"]
+
+140728936468856[ label="{With|+val:IntOrVar\l}"]
+
+140728936408648[ label="{TablePar|+name:ID\l+unit:UnitId\l}"]
+
+140728936471096 -> 140728936408648[arrowtail=diamond, dir=both, headlabel="pars 1..*"]
+140728936471096[ label="{FunctionTable|+name:ID\l+unit:UnitId\l}"]
+
+140728936474456[ label="{FloatOrVar|FLOAT\|ID}"]
+
+140728936477816[ label="{IntOrVar|INT\|ID}"]
+
+140728936481176[ label="{KW|DEPEND \|WITH \|FROM \|TO }"]
+
+140728936484536[ label="{*V|}"]
+140728936484536 -> 140728936439896 [dir=back]
+140728936484536 -> 140728938023224 [dir=back]
+
+140728936476888 -> 140728936484536[headlabel="var "]
+140728936476888[ label="{SafeVar|}"]
+
+140728938821048[ label="{Independent|+name:ID\l+f:FLOAT\l+t:FLOAT\l+w:INT\l+s:FLOAT\l+u:UnitId\l}"]
+
+140728938796920 -> 140728938814552[arrowtail=diamond, dir=both, headlabel="stmts 0..*"]
+140728938796920[ label="{SolvableBlock|}"]
+
+140728938814552[ label="{*SolvableBlockStmt|}"]
+140728938814552 -> 140728938142216 [dir=back]
+140728938814552 -> 140728936464568 [dir=back]
+
+140728938142216 -> 140728938141288[headlabel="solve "]
+140728938142216[ label="{Solve|+method:ID\l}"]
+
+140728938145000[ label="{Method|derivimplicit\|sparse\|cnexp\|euler}"]
+
+140728938141288[ label="{*Solvable|}"]
+140728938141288 -> 140728939392392 [dir=back]
+140728938141288 -> 140728938808056 [dir=back]
+140728938141288 -> 140728938094664 [dir=back]
+
+140728938808056 -> 140728938097096[arrowtail=diamond, dir=both, headlabel="statements 0..*"]
+140728938808056[ label="{Kinetic|+name:ID\l}"]
+
+140728938799704[ label="{*KS|}"]
+140728938799704 -> 140728938087016 [dir=back]
+140728938799704 -> 140728938081800 [dir=back]
+140728938799704 -> 140728938123912 [dir=back]
+
+140728938097096[ label="{*KineticStatement|}"]
+140728938097096 -> 140728938799704 [dir=back]
+140728938097096 -> 140728938127272 [dir=back]
+140728938097096 -> 140728936464568 [dir=back]
+
+140728938087016 -> 140728938023224[headlabel="reactant "]
+140728938087016 -> 140728938023224[headlabel="product "]
+140728938087016 -> 140728938050632[arrowtail=diamond, dir=both, headlabel="fwd "]
+140728938087016 -> 140728938050632[arrowtail=diamond, dir=both, headlabel="rev "]
+140728938087016[ label="{Reaction|}"]
+
+140728938081800 -> 140728938023224[headlabel="reactant "]
+140728938081800 -> 140728938050632[arrowtail=diamond, dir=both, headlabel="flux "]
+140728938081800[ label="{Flux|}"]
+
+140728938123912 -> 140728938050632[arrowtail=diamond, dir=both, headlabel="volume "]
+140728938123912 -> 140728938783928[headlabel="states 1..*"]
+140728938123912[ label="{Compartment|}"]
+
+140728938127272 -> 140728938130632[arrowtail=diamond, dir=both, headlabel="reactants "]
+140728938127272 -> 140728936454488[arrowtail=diamond, dir=both, headlabel="val "]
+140728938127272[ label="{Conserve|}"]
+
+140728938130632 -> 140728938137352[arrowtail=diamond, dir=both, headlabel="op 0..*"]
+140728938130632[ label="{React|}"]
+
+140728938133992 -> 140728938023224[headlabel="var "]
+140728938133992[ label="{VarRef|}"]
+
+140728938137352[ label="{*Primary|INT VarRef\|INT}"]
+140728938137352 -> 140728938133992 [dir=back]
+
+140728936439896[ label="{Local|+name:ID\l+len:INT\l}"]
+
+140728936449976 -> 140728936439896[arrowtail=diamond, dir=both, headlabel="vars 0..*"]
+140728936449976[ label="{Locals|}"]
+
+140728938122984[ label="{Include|+file:STRING\l}"]
+
+
+}
