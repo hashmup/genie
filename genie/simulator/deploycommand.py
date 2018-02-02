@@ -19,36 +19,41 @@ class DeployCommand():
         self.build_generator = BuildGenerator()
         self.job_generator = JobGenerator(job_name)
 
-    def build(self, env, bench, params, use_tmp):
-        self.build_generator.gen(params, use_tmp, env)
+    def build(self, env, bench, params, use_tmp, build_neuron, neuron_use_tmp):
+        self.build_generator.gen(params, use_tmp, neuron_use_tmp, env)
         commands = []
         tmp_str = ".tmp" if use_tmp else ""
         if env == "cluster":
-            commands = [{
-                "command": "make",
-                "args": ["clean"],
-                "options": [],
-                "work_dir": "{0}/nrn-7.2{1}".format(self.neuron_path, tmp_str)
-            },
-                {
-                "command": "../../genie/simulator/tmp/build_config.sh",
-                "args": [],
-                "options": [],
-                "work_dir": "{0}/nrn-7.2{1}".format(self.neuron_path, tmp_str)
-            },
-                {
-                "command": "make",
-                "args": [],
-                "options": [],
-                "work_dir": "{0}/nrn-7.2{1}".format(self.neuron_path, tmp_str)
-            },
-                {
-                "command": "make",
-                "args": ["install"],
-                "options": [],
-                "work_dir": "{0}/nrn-7.2{1}".format(self.neuron_path, tmp_str)
-            },
-                {
+            if build_neuron:
+                commands.append({
+                    "command": "make",
+                    "args": ["clean"],
+                    "options": [],
+                    "work_dir": "{0}/nrn-7.2{1}".format(self.neuron_path,
+                                                        tmp_str)
+                })
+                commands.append({
+                    "command": "../../genie/simulator/tmp/build_config.sh",
+                    "args": [],
+                    "options": [],
+                    "work_dir": "{0}/nrn-7.2{1}".format(self.neuron_path,
+                                                        tmp_str)
+                })
+                commands.append({
+                    "command": "make",
+                    "args": [],
+                    "options": [],
+                    "work_dir": "{0}/nrn-7.2{1}".format(self.neuron_path,
+                                                        tmp_str)
+                })
+                commands.append({
+                    "command": "make",
+                    "args": ["install"],
+                    "options": [],
+                    "work_dir": "{0}/nrn-7.2{1}".format(self.neuron_path,
+                                                        tmp_str)
+                })
+            commands.append({
                 "command": "./make_special.sh",
                 "args": ["x86_64", bench, tmp_str],
                 "options": [],

@@ -79,12 +79,15 @@ class TaskRunner:
             shouldBuild = self.current_build_param != build_param or\
                 self.current_bench != is_bench or\
                 self.current_macro_table != macro_table
+            shouldBuildNeuron = self.current_build_param != build_param or\
+                self.current_bench != is_bench
             self.current_build_param = build_param
             self.current_bench = is_bench
             self.current_macro_table = macro_table
             self.pending_lock.release()
             self.compile_lock.release()
             job_id = self.deploy(shouldBuild,
+                                 shouldBuildNeuron
                                  build_param,
                                  job_param,
                                  is_bench,
@@ -271,15 +274,20 @@ class TaskRunner:
 
     def deploy(self,
                shouldBuild,
+               shouldBuildNeuron,
                build_params,
                job_params,
                is_bench,
                macro_table):
         _use_tmp = self.use_tmp
+        _neuron_use_tmp = self.neuron_use_tmp
         if shouldBuild:
             self.compile_lock.acquire()
             self.use_tmp = not self.use_tmp
             _use_tmp = self.use_tmp
+            if shouldBuildNeuron:
+                self.neuron_use_tmp = not self.neuron_use_tmp
+                _neuron_use_tmp = self.neuron_use_tmp
             path = "neuron_kplus/mod/hh_k.mod"
             if is_bench or not len(macro_table):
                 macro_table = None
@@ -287,7 +295,9 @@ class TaskRunner:
             self.deployCommand.build(self.environment,
                                      is_bench,
                                      build_params,
-                                     _use_tmp)
+                                     _use_tmp,
+                                     shouldBuildNeuron
+                                     _neuron_use_tmp)
         else:
             self.compile_lock.acquire()
         self.job_cnt += 1

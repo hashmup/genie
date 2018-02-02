@@ -6,17 +6,18 @@ class BuildGenerator(Generator):
     def __init__(self):
         Generator.__init__(self, [['build', 'sh'], ['build_config', 'sh']])
 
-    def gen(self, build_params, use_tmp, env):
+    def gen(self, build_params, use_tmp, neuron_use_tmp, env):
         neuron_path = build_params["neuron_path"]
         specials_path = build_params["specials_path"]
         if use_tmp:
-            neuron_path += ".tmp"
             specials_path += ".tmp"
+        if neuron_use_tmp:
+            neuron_path += ".tmp"
         if env == "cluster":
             env = "x86_64"
         elif env == "k":
             env = "sparc64"
-        print(use_tmp, neuron_path, specials_path)
+        print(use_tmp, neuron_use_tmp, neuron_path, specials_path)
         tmp = self.contents["build"]['template'].render(
             neuron_path=neuron_path,
             config_path=self.contents["build_config"]['output_file'],
