@@ -51,13 +51,13 @@
     "job" : {
         "job_cluster": {
             "nodes":"1",
-            "ppn":"23,28,1",
+            "ppn":"26",
             "modules": [
             ],
-            "omp_num_threads": "[1, 2, 3, 4, 5, 6, 7, 8, 9,  11, 13, 14, 16]",
+            "omp_num_threads": "11",
             "nrniv": "../specials/x86_64/special -mpi",
             "hoc_name": "../hoc/bench_main.hoc",
-            "stop_time": 250,
+            "stop_time": 1000,
             "nthread": 16,
             "prof": ""
         },

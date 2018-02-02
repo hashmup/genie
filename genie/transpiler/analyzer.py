@@ -73,7 +73,14 @@ class Analyzer():
 
     def get_table_candidates(self, path):
         token_candidate = self.get_table_candidate(path)
-        return list(self.powerset(token_candidate))
+        pset = list(self.powerset(token_candidate))
+        candidates = []
+        for c1 in pset:
+            tmp = []
+            for c2 in c1:
+                tmp.append(tuple(c2))
+            candidates.append(tuple(tmp))
+        return candidates
 
     def get_symbols(self, path, stmt_type):
         self.path = path

@@ -72,6 +72,7 @@ class TaskRunner:
         num = len(self.pending_jobs)
         self.pending_lock.release()
         if num > 0:
+            self.compile_lock.acquire()
             self.pending_lock.acquire()
             build_param, job_param, is_bench, macro_table =\
                 self.pending_jobs.pop(0)
@@ -82,6 +83,7 @@ class TaskRunner:
             self.current_bench = is_bench
             self.current_macro_table = macro_table
             self.pending_lock.release()
+            self.compile_lock.release()
             job_id = self.deploy(shouldBuild,
                                  build_param,
                                  job_param,
@@ -119,6 +121,7 @@ class TaskRunner:
                 for key in merge_params.keys():
                     if isinstance(merge_params[key], defaultdict) or\
                             isinstance(merge_params[key], list) or\
+                            isinstance(merge_params[key], tuple) or\
                             isinstance(merge_params[key], dict):
                         if key not in self.result_table:
                             self.result_table.loc[-1, key] = 0
@@ -263,7 +266,7 @@ class TaskRunner:
                     break
                 threading.Thread(target=self.deploy_job).start()
                 self.current_job_num += 1
-                time.sleep(3)
+                time.sleep(200)
                 self.current_lock.release()
 
     def deploy(self,
@@ -277,6 +280,7 @@ class TaskRunner:
             self.compile_lock.acquire()
             self.use_tmp = not self.use_tmp
             _use_tmp = self.use_tmp
+            path = "neuron_kplus/mod/hh_k.mod"
             if is_bench or not len(macro_table):
                 macro_table = None
             self.compiler.gen(path, macro_table)
