@@ -58,7 +58,7 @@ class DeployCommand():
                 "args": ["x86_64", bench, tmp_str],
                 "options": [],
                 "work_dir": "{0}/specials{1}".format(self.neuron_path, tmp_str)
-            }]
+            })
         if env == "k":
             commands = [{
                 "command": "../config/do_config_k1.sh",

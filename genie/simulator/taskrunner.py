@@ -57,6 +57,7 @@ class TaskRunner:
         self.neuron_path = neuron_path
         self.job_cnt = 0
         self.use_tmp = True  # We use both original and tmp
+        self.neuron_use_tmp = True
         self.complete = False
         self.first = True
         self.cnt = 0
@@ -87,7 +88,7 @@ class TaskRunner:
             self.pending_lock.release()
             self.compile_lock.release()
             job_id = self.deploy(shouldBuild,
-                                 shouldBuildNeuron
+                                 shouldBuildNeuron,
                                  build_param,
                                  job_param,
                                  is_bench,
@@ -296,7 +297,7 @@ class TaskRunner:
                                      is_bench,
                                      build_params,
                                      _use_tmp,
-                                     shouldBuildNeuron
+                                     shouldBuildNeuron,
                                      _neuron_use_tmp)
         else:
             self.compile_lock.acquire()
