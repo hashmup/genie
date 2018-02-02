@@ -39,6 +39,7 @@ class TaskRunner:
         self.candidate_jobs = defaultdict(dict)
         self.current_build_param = None
         self.current_bench = True
+        self.current_loop_division = True
         self.macro_table = True
         self.shell = Shell()
         self.summarizer = Summarizer()
@@ -63,9 +64,9 @@ class TaskRunner:
         self.cnt = 0
         self.job_total_num = 0
 
-    def push_job(self, build_param, job_param, is_bench, macro_table):
+    def push_job(self, build_param, job_param, is_bench, is_loop_division, macro_table):
         self.pending_jobs.append(
-            [build_param, job_param, is_bench, macro_table])
+            [build_param, job_param, is_bench, is_loop_division, macro_table])
         self.job_total_num += 1
 
     def deploy_job(self):
@@ -75,7 +76,7 @@ class TaskRunner:
         if num > 0:
             self.compile_lock.acquire()
             self.pending_lock.acquire()
-            build_param, job_param, is_bench, macro_table =\
+            build_param, job_param, is_bench, is_loop_division, macro_table =\
                 self.pending_jobs.pop(0)
             shouldBuild = self.current_build_param != build_param or\
                 self.current_bench != is_bench or\
@@ -92,6 +93,7 @@ class TaskRunner:
                                  build_param,
                                  job_param,
                                  is_bench,
+                                 is_loop_division,
                                  macro_table)
             self.relation_table_job_cnt[job_id] = self.job_cnt
             if self.first:
@@ -279,6 +281,7 @@ class TaskRunner:
                build_params,
                job_params,
                is_bench,
+               is_loop_division,
                macro_table):
         _use_tmp = self.use_tmp
         _neuron_use_tmp = self.neuron_use_tmp
@@ -292,7 +295,7 @@ class TaskRunner:
             path = "neuron_kplus/mod/hh_k.mod"
             if is_bench or not len(macro_table):
                 macro_table = None
-            self.compiler.gen(path, macro_table)
+            self.compiler.gen(path, is_loop_division, macro_table)
             self.deployCommand.build(self.environment,
                                      is_bench,
                                      build_params,

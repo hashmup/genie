@@ -22,15 +22,15 @@ class NeuronFunc():
         self.nrn_init = NrnInit()
         self.nrn_state = NrnState()
 
-    def gen(self, root, macro_table):
+    def gen(self, root, do_loop_division, macro_table):
         return {
             "nrn_alloc": self.nrn_alloc.gen(root),
             "nrn_cur": self.nrn_cur.gen(root, macro_table),
             "nrn_init": self.nrn_init.gen(root, macro_table),
-            "nrn_state": self.nrn_state.gen(root, macro_table)
+            "nrn_state": self.nrn_state.gen(root, do_loop_division, macro_table)
         }
 
-    def compile(self, filename, root, macro_table):
-        tokens = self.gen(root, macro_table)
+    def compile(self, filename, root, do_loop_division, macro_table):
+        tokens = self.gen(root, do_loop_division, macro_table)
         tokens.update({"filename": filename}.items())
         return self.jinja_template.render(**tokens)

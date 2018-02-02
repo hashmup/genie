@@ -23,13 +23,16 @@ class Processor():
         config = ConfigParser(path).parse()
         return config['build'], config['job']
 
-    def run_(self, is_bench, macro_table):
+    def run_(self, is_bench, is_loop_division, macro_table):
         if len(macro_table) and is_bench:
+            return
+        if is_loop_division and len(macro_table) and is_bench:
             return
         self.taskRunner.push_job(
             self.buildProcessor.cur_params(),
             self.jobProcessor.cur_params(),
             is_bench,
+            is_loop_division,
             macro_table
         )
 
@@ -59,14 +62,15 @@ class Processor():
         candidates =\
             self.analyzer.get_table_candidates("neuron_kplus/mod/hh_k.mod")
         for is_bench in [False]:
-            for macro_table in candidates:
-                self.buildProcessor.init()
-                while self.buildProcessor.has_next():
-                    self.buildProcessor.process()
-                    self.jobProcessor.init()
-                    while self.jobProcessor.has_next():
-                        self.jobProcessor.process()
-                        self.run_(is_bench, macro_table)
+            for is_loop_division in [True, False]:
+                for macro_table in candidates:
+                    self.buildProcessor.init()
+                    while self.buildProcessor.has_next():
+                        self.buildProcessor.process()
+                        self.jobProcessor.init()
+                        while self.jobProcessor.has_next():
+                            self.jobProcessor.process()
+                            self.run_(is_bench, is_loop_division, macro_table)
         self.taskRunner.run()
 
     def setup(self, neuron_path):

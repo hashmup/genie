@@ -82,6 +82,33 @@ class Analyzer():
             candidates.append(tuple(tmp))
         return candidates
 
+    def is_stmt_in_group(self, token_tables, stmt, exclude):
+        tokens = []
+        if hasattr(stmt, 'variable'):
+            if stmt.variable:
+                if hasattr(stmt.variable, 'lems'):
+                    exp = stmt.variable.lems
+                else:
+                    exp = stmt.variable
+                tokens_lhs = self.parse_into_token(exp)
+                if len(tokens_lhs):
+                    tokens.append(tokens_lhs)
+        if hasattr(stmt, 'expression'):
+            if stmt.expression.lems:
+                tokens_rhs = self.parse_into_token(stmt.expression.lems)
+                if len(tokens_rhs):
+                    tokens.append(tokens_rhs)
+        tokens = list(chain.from_iterable(tokens))
+        included = True
+        for i in range(len(token_tables)):
+            included = True
+            for token in tokens:
+                if token not in exclude and token not in token_tables[i]:
+                    included = False
+            if included:
+                return i
+        return -1
+
     def get_symbols(self, path, stmt_type):
         self.path = path
         root = self.parse()
@@ -106,6 +133,24 @@ class Analyzer():
             if len(tokens):
                 symbols.append(list(chain.from_iterable(tokens)))
         return symbols
+
+    def get_symbols_from_stmt(self, stmt):
+        tokens = []
+        if hasattr(stmt, 'variable'):
+            if stmt.variable:
+                if hasattr(stmt.variable, 'lems'):
+                    exp = stmt.variable.lems
+                else:
+                    exp = stmt.variable
+                tokens_lhs = self.parse_into_token(exp)
+                if len(tokens_lhs):
+                    tokens.append(tokens_lhs)
+        if hasattr(stmt, 'expression'):
+            if stmt.expression.lems:
+                tokens_rhs = self.parse_into_token(stmt.expression.lems)
+                if len(tokens_rhs):
+                    tokens.append(tokens_rhs)
+        return list(chain.from_iterable(tokens))
 
     def get_derivative_symbols(self, path):
         return self.get_symbols(path, 'Derivative')
