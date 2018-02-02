@@ -3,7 +3,7 @@ import re
 from os.path import join, dirname, abspath
 from collections import defaultdict
 from textx.model import children_of_type, parent_of_type
-from itertools import chain
+from itertools import chain, combinations
 from transpiler.parser.lems import LemsCompTypeGenerator
 from utils.fileutil import *
 
@@ -66,6 +66,14 @@ class Analyzer():
         table_candidate = derivative_sym + breakpoint_sym
         uft = UnionFindToken(table_candidate)
         return uft.get_related_tokens()
+
+    def powerset(self, iterable):
+        s = list(iterable)
+        return chain.from_iterable(combinations(s, r) for r in range(len(s)+1))
+
+    def get_table_candidates(self, path):
+        token_candidate = self.get_table_candidate(path)
+        return list(self.powerset(token_candidate))
 
     def get_symbols(self, path, stmt_type):
         self.path = path

@@ -3,6 +3,7 @@ from simulator.configparser import ConfigParser
 from simulator.buildprocessor import BuildProcessor
 from simulator.jobprocessor import JobProcessor
 from simulator.taskrunner import TaskRunner
+from transpiler.analyzer import Analyzer
 from utils.env import Environment
 from utils.shell import Shell
 
@@ -15,20 +16,21 @@ class Processor():
         self.jobProcessor = JobProcessor(job)
         self.shell = Shell()
         self.setup(neuron_path)
+        self.analyzer = Analyzer()
         self.taskRunner = TaskRunner(self.env.get_env(), neuron_path)
 
     def parseConfigFile(self, path):
         config = ConfigParser(path).parse()
         return config['build'], config['job']
 
-    def run_(self, is_bench, use_macro):
-        if use_macro and is_bench:
+    def run_(self, is_bench, macro_table):
+        if len(macro_table) and is_bench:
             return
         self.taskRunner.push_job(
             self.buildProcessor.cur_params(),
             self.jobProcessor.cur_params(),
             is_bench,
-            use_macro
+            macro_table
         )
 
     def caller_name(self, skip=2):
@@ -54,15 +56,17 @@ class Processor():
         print("me", inspect.stack()[1][3])
         print("module", inspect.getmodulename(s[1][1]))
         print("dad", self.caller_name())
+        candidates =\
+            self.analyzer.get_table_candidates("neuron_kplus/mod/hh_k.mod")
         for is_bench in [False]:
-            for use_macro in [True, False]:
+            for macro_table in candidates:
                 self.buildProcessor.init()
                 while self.buildProcessor.has_next():
                     self.buildProcessor.process()
                     self.jobProcessor.init()
                     while self.jobProcessor.has_next():
                         self.jobProcessor.process()
-                        self.run_(is_bench, use_macro)
+                        self.run_(is_bench, macro_table)
         self.taskRunner.run()
 
     def setup(self, neuron_path):
