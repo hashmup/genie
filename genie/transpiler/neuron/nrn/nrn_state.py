@@ -48,9 +48,12 @@ class NrnState():
                       "#pragma loop norecurrence\n"\
                       "\tfor (_iml = 0; _iml < _cntml; _iml++) {\n"
         loop_suffix = "\t}\n"
-        relation_list = [[] for x in range(len(macro_table))]
+        if macro_table:
+            relation_list = [[] for x in range(len(macro_table))]
+        else:
+            relation_list = [[]]
         remain_stmt = []
-        if do_loop_division:
+        if do_loop_division and macro_table:
             for stmt in stmts:
                 if stmt.variable and stmt.expression:
                     table_id =\

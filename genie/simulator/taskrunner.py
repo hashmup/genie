@@ -101,16 +101,19 @@ class TaskRunner:
                 self.candidate_jobs[job_id]["build_param"] = build_param
                 self.candidate_jobs[job_id]["job_param"] = job_param
                 self.candidate_jobs[job_id]["is_bench"] = is_bench
+                self.candidate_jobs[job_id]["is_loop_division"] = is_loop_division
                 self.candidate_jobs[job_id]["macro_table"] = macro_table
             else:
                 for key in self.candidate_jobs:
                     build = self.candidate_jobs[key]["build_param"]
                     job = self.candidate_jobs[key]["job_param"]
                     bench = self.candidate_jobs[key]["is_bench"]
+                    loop_division = self.candidate_jobs[key]["is_loop_division"]
                     macro = self.candidate_jobs[key]["macro_table"]
                     if build == build_param\
                         and job == job_param\
                             and bench == is_bench\
+                            and loop_division == is_loop_division\
                             and macro == macro_table:
                                 self.relation_table[job_id] = key
             self.running_lock.acquire()
@@ -122,6 +125,7 @@ class TaskRunner:
                          **job_param,
                          **{"job_id": job_id,
                             "bench": is_bench,
+                            "loop_division": is_loop_division,
                             "macro": macro_table,
                             "time": 0})
                 for key in merge_params.keys():
@@ -235,9 +239,11 @@ class TaskRunner:
                         job = self.candidate_jobs[job_id]["job_param"]
                         is_bench = self.candidate_jobs[job_id]["is_bench"]
                         macro_table = self.candidate_jobs[job_id]["macro_table"]
+                        is_loop_division = self.candidate_jobs[job_id]["is_loop_division"]
                         self.pending_jobs_bak.append([build,
                                                       job,
                                                       is_bench,
+                                                      is_loop_division,
                                                       macro_table])
                         self.job_total_num += 1
                 elif self.cnt < 4:
