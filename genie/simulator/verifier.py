@@ -7,11 +7,9 @@ import re
 spike_exp = re.compile(
     "SPIKE : \t (?P<val>\d+\.*\d*)\t (?P<idvec>[0-9]+) \[(?P<pid>\d+)\]")
 start_exp = re.compile(
-    "\[(?P<pid>\d+)\] NC = (?P<nc>\d+), SYN = (?P<syn>\d+), \
-    tmp_pre = (?P<tmp_pre>\d+), tmp_post = (?P<tmp_post>\d+)")
+    "\[(?P<pid>\d+)\] NC = (?P<nc>\d+), SYN = (?P<syn>\d+), tmp_pre = (?P<tmp_pre>\d+), tmp_post = (?P<tmp_post>\d+)")
 end_exp = re.compile(
-    "\[(?P<pid>\d+)\] nsendmax=(?P<nsendmax>\d+) nsend=(?P<nsend>\d+) \
-    nrecv=(?P<nrecv>\d+) nrecv_useful=(?P<nrecv_useful>\d+)")
+    "\[(?P<pid>\d+)\] nsendmax=(?P<nsendmax>\d+) nsend=(?P<nsend>\d+) nrecv=(?P<nrecv>\d+) nrecv_useful=(?P<nrecv_useful>\d+)")
 dir_path = "tmp/"
 
 

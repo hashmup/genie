@@ -60,66 +60,75 @@ class DeployCommand():
                 "work_dir": "{0}/specials{1}".format(self.neuron_path, tmp_str)
             })
         if env == "k":
-            commands = [{
-                "command": "../config/do_config_k1.sh",
-                "args": [],
-                "options":[],
-                "work_dir": "{0}/nrn-7.2{1}".format(self.neuron_path, tmp_str)
-            },
-                {
-                "command": "make",
-                "args": [],
-                "options": [],
-                "work_dir": "{0}/nrn-7.2{1}".format(self.neuron_path, tmp_str)
-            },
-                {
-                "command": "make",
-                "args": ["install"],
-                "options": [],
-                "work_dir": "{0}/nrn-7.2{1}".format(self.neuron_path, tmp_str)
-            },
-                {
-                "command": "../../genie/simulator/tmp/build_config.sh",
-                "args": [],
-                "options": [],
-                "work_dir": "{0}/nrn-7.2{1}".format(self.neuron_path, tmp_str)
-            },
-                {
-                "command": "export",
-                "args": ["LANG=C"],
-                "options": [],
-                "work_dir": "{0}/nrn-7.2{1}".format(self.neuron_path, tmp_str)
-            },
-                {
-                "command": "export",
-                "args": ["LC_ALL=C"],
-                "options": [],
-                "work_dir": "{0}/nrn-7.2{1}".format(self.neuron_path, tmp_str)
-            },
-                {
-                "command": "make",
-                "args": [],
-                "options": [],
-                "work_dir": "{0}/nrn-7.2{1}".format(self.neuron_path, tmp_str)
-            },
-                {
-                "command": "make",
-                "args": ["install"],
-                "options": [],
-                "work_dir": "{0}/nrn-7.2{1}".format(self.neuron_path, tmp_str)
-            },
-                {
-                "command": "cp",
-                "args": ["./x86_64/bin/*", "./sparc64/bin/"],
-                "options": [],
-                "work_dir": "{0}/exec{1}".format(self.neuron_path, tmp_str)
-            },
-                {
+            if build_neuron:
+                commands.append({
+                    "command": "../config/do_config_k1.sh",
+                    "args": [],
+                    "options": [],
+                    "work_dir": "{0}/nrn-7.2{1}".format(self.neuron_path,
+                                                        tmp_str)
+                })
+                commands.append({
+                    "command": "make",
+                    "args": [],
+                    "options": [],
+                    "work_dir": "{0}/nrn-7.2{1}".format(self.neuron_path,
+                                                        tmp_str)
+                })
+                commands.append({
+                    "command": "make",
+                    "args": ["install"],
+                    "options": [],
+                    "work_dir": "{0}/nrn-7.2{1}".format(self.neuron_path,
+                                                        tmp_str)
+                })
+                commands.append({
+                    "command": "../../genie/simulator/tmp/build_config.sh",
+                    "args": [],
+                    "options": [],
+                    "work_dir": "{0}/nrn-7.2{1}".format(self.neuron_path,
+                                                        tmp_str)
+                })
+                commands.append({
+                    "command": "export",
+                    "args": ["LANG=C"],
+                    "options": [],
+                    "work_dir": "{0}/nrn-7.2{1}".format(self.neuron_path,
+                                                        tmp_str)
+                })
+                commands.append({
+                    "command": "export",
+                    "args": ["LC_ALL=C"],
+                    "options": [],
+                    "work_dir": "{0}/nrn-7.2{1}".format(self.neuron_path,
+                                                        tmp_str)
+                })
+                commands.append({
+                    "command": "make",
+                    "args": [],
+                    "options": [],
+                    "work_dir": "{0}/nrn-7.2{1}".format(self.neuron_path,
+                                                        tmp_str)
+                })
+                commands.append({
+                    "command": "make",
+                    "args": ["install"],
+                    "options": [],
+                    "work_dir": "{0}/nrn-7.2{1}".format(self.neuron_path,
+                                                        tmp_str)
+                })
+                commands.append({
+                    "command": "cp",
+                    "args": ["./x86_64/bin/*", "./sparc64/bin/"],
+                    "options": [],
+                    "work_dir": "{0}/exec{1}".format(self.neuron_path, tmp_str)
+                })
+            commands.append({
                 "command": "./make_special.sh",
                 "args": [],
                 "options": ["sparc64", bench, tmp_str],
                 "work_dir": "{0}/specials{1}".format(self.neuron_path, tmp_str)
-            }]
+            })
         self.shell.run_cmds(commands)
 
     def run(self, env, params, cnt, use_tmp):
